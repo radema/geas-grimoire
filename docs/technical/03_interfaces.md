@@ -17,9 +17,18 @@ Many skills package complex logic into Python scripts to ensure reliability and 
 *   **Standard Environment**: Python 3.x within the repository's virtual environment.
 *   **Argument Pattern**: Scripts should generally accept target paths or configuration flags as command-line arguments.
 
-**Example:**
+**Examples:**
 ```bash
+# Documentation scaffolding
 python3 .agent/skills/technical-doc-writer/scripts/scaffold_docs.py <target_directory>
+
+# Chart generation (word-doc skill)
+uv run python skills/word-doc/scripts/chart_generator.py \
+  --type line --data data.csv --x month --y revenue --output chart.png
+
+# Markdown to Word conversion (word-doc skill)
+uv run python skills/word-doc/scripts/md_to_docx.py \
+  --input content.md --template templates/report.docx --output report.docx
 ```
 
 ## 2. Workflow Interface

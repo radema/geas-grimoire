@@ -17,6 +17,8 @@ Skills are the functional units of the agent. To add a new skill:
     ```
 4.  **Define Instructions**: Write clear, step-by-step instructions for the Agent.
 5.  **Add Scripts (Optional)**: If the skill requires complex logic, place Python scripts in a `scripts/` subfolder.
+6.  **Add Templates (Optional)**: For document generation skills, add reusable templates in a `templates/` subfolder (see `word-doc` skill).
+7.  **Add References (Optional)**: Include syntax guides or lookup tables in a `references/` subfolder.
 
 ## 2. Adding a New Workflow
 

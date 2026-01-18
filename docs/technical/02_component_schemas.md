@@ -12,7 +12,21 @@ skills/
 └── <skill-name>/
     ├── SKILL.md          # Required: Definition and instructions
     ├── scripts/          # Optional: Python/Bash automation scripts
-    └── resources/        # Optional: Templates, examples, or static assets
+    ├── templates/        # Optional: Document templates, scaffolds
+    ├── references/       # Optional: Syntax guides, lookup tables
+    └── resources/        # Optional: Examples or static assets
+```
+
+**Example: `word-doc` Skill**
+```text
+skills/word-doc/
+├── SKILL.md               # Workflow + usage instructions
+├── scripts/
+│   ├── md_to_docx.py      # Markdown → Word converter
+│   └── chart_generator.py # Seaborn chart generator
+├── templates/             # .docx templates + .palette.json
+└── references/
+    └── markdown_syntax.md # Supported markdown reference
 ```
 
 ### Metadata (YAML Frontmatter)

@@ -12,8 +12,13 @@ The core philosophy is the separation of **Capability** (Skills), **Process** (W
 *   **YAML Frontmatter**: Used for metadata (name, description, tags) to allow programmatic parsing of skills and workflows.
 
 ### Scripting & Automation
-*   **Python 3.x**: Used for the executable logic within Skills (e.g., `technical-doc-writer/scripts/`).
+*   **Python 3.x**: Used for the executable logic within Skills (e.g., `technical-doc-writer/scripts/`, `word-doc/scripts/`).
 *   **Bash**: Simple automation scripts.
+
+### Document Generation
+*   **python-docx**: Word document creation and manipulation (`word-doc` skill).
+*   **pyyaml/mistune**: YAML frontmatter parsing and Markdown-to-document conversion.
+*   **seaborn/matplotlib/pandas**: Data visualization for embedded charts.
 
 ### Integrations
 *   **Model Context Protocol (MCP)**: The repository aligns with MCP standards where applicable to expose tools and resources to the agent.

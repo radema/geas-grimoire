@@ -41,15 +41,31 @@ Adds details to an existing topic.
 uv run python .agent/skills/build-knowledge/scripts/librarian.py append --filename "Note_Name.md" --content "Additional info..."
 ```
 
+## Dual-Write Protocol (Graph Sync)
+
+To ensure the Agent's "active memory" matches the "archived memory", you MUST synchronize key concepts to the MCP Graph Memory if the tools are available.
+
+**Triggers:**
+*   **Creating a Note** -> Create a corresponding Entity.
+*   **Linking Notes** -> Create a corresponding Relation.
+
+**Procedure:**
+1.  Check if `mcp_memory_create_entities` is available.
+2.  **Files First**: Execute the `librarian.py` file operations as usual.
+3.  **Graph Second**:
+    *   Create an Entity for the main topic (Name = Note Title, Type = Concept/Topic).
+    *   Add an Observation summarizing the content (approx. 1 sentence).
+    *   Create Relations linking it to other entities (e.g., `NewTopic` *relates_to* `Index`).
+
 ## Standard Workflow
 
 1. **Analyze**: User says "Remember X".
 2. **Search**: `search --keywords "X"` to check for existing context.
 3. **Branching Logic**:
-   - **If exists**: `read` it, then `append` new info.
-   - **If new**: `create` the node.
-4. **Link**: `read` the parent/index note and `append` a link `[[X]]` to ensure discovery.
-5. **Confirm**: Tell the user where the knowledge is stored.
+   - **If exists**: `read` it, then `append` new info. Update Graph with new Observation.
+   - **If new**: `create` the node. Create Entity in Graph.
+4. **Link**: `read` the parent/index note and `append` a link `[[X]]` to ensure discovery. Create Relation in Graph.
+5. **Confirm**: Tell the user where the knowledge is stored (File + Graph).
 
 ## Troubleshooting & Setup
 

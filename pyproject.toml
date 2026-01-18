@@ -1,0 +1,10 @@
+[project]
+name = "geas-grimoire"
+version = "0.1.0"
+description = "A personal repository of Agentic prompts, skills, and workflows."
+authors = [
+    { name = "Raul De Maio" }
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []

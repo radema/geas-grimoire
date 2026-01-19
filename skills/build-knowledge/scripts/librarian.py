@@ -43,12 +43,15 @@ class KnowledgeGraphTool:
         if not wordnet:
             return keywords
         expanded = set(keywords)
-        for k in keywords:
+        # Use set(keywords) to avoid re-processing duplicates
+        for k in set(keywords):
             try:
-                for syn in wordnet.synsets(k):
-                    for lemma in syn.lemmas():
-                        expanded.add(lemma.name().replace("_", " "))
-            except:  # noqa: E722
+                expanded.update(
+                    lemma.name().replace("_", " ")
+                    for syn in wordnet.synsets(k)
+                    for lemma in syn.lemmas()
+                )
+            except Exception:
                 pass
         return list(expanded)
 

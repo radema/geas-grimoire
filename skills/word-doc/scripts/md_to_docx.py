@@ -256,14 +256,16 @@ def convert_markdown_to_docx(
     in_table = False
     table_lines = []
     
+    # Initialize renderer and parser once
+    renderer = DocxRenderer(doc, placeholders, input_path.parent)
+    md = mistune.create_markdown(renderer=renderer)
+
     for line in lines:
         # Detect table start
         if "|" in line and not in_table:
             # Process any pending markdown
             if current_block:
                 block_text = "\n".join(current_block)
-                renderer = DocxRenderer(doc, placeholders, input_path.parent)
-                md = mistune.create_markdown(renderer=renderer)
                 md(block_text)
                 current_block = []
             in_table = True
@@ -285,8 +287,6 @@ def convert_markdown_to_docx(
         parse_markdown_table(table_lines, doc, placeholders)
     elif current_block:
         block_text = "\n".join(current_block)
-        renderer = DocxRenderer(doc, placeholders, input_path.parent)
-        md = mistune.create_markdown(renderer=renderer)
         md(block_text)
     
     # Save output

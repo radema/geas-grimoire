@@ -58,7 +58,7 @@ class KnowledgeGraphTool:
         """Finds files containing keywords (using grep)"""
         self.current_step += 1
         all_terms = self._expand_synonyms(keywords)
-        pattern = "|".join(all_terms)
+        pattern = "|".join(map(re.escape, all_terms))
 
         # grep -r -i -l (recursive, case-insensitive, filename only)
         # Fix: handle cases where pattern might be empty or problematic

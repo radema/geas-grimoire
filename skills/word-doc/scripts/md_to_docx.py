@@ -66,6 +66,8 @@ def replace_placeholders(text: str, placeholders: dict) -> str:
 class DocxRenderer(mistune.HTMLRenderer):
     """Custom renderer that builds Word document elements."""
     
+    HTML_TAG_REGEX = re.compile(r"(<strong>|</strong>|<em>|</em>|<code>|</code>)")
+
     def __init__(self, doc: Document, placeholders: dict, base_path: Path):
         super().__init__()
         self.doc = doc
@@ -151,8 +153,7 @@ class DocxRenderer(mistune.HTMLRenderer):
     def _add_formatted_text(self, paragraph, html_text: str):
         """Parse HTML-like formatting and add runs to paragraph."""
         # Simple parser for <strong>, <em>, <code> tags
-        pattern = r"(<strong>|</strong>|<em>|</em>|<code>|</code>)"
-        parts = re.split(pattern, html_text)
+        parts = self.HTML_TAG_REGEX.split(html_text)
         
         bold = False
         italic = False

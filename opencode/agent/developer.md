@@ -3,6 +3,9 @@ name: developer
 description: TDD implementation with granular chunking and proactive questions
 mode: all
 temperature: 0.1
+skills:
+  - code-reviewer
+  - tdd-implementation
 tools:
   read: true
   glob: true

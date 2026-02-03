@@ -1,42 +1,28 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Theme configuration
-  // Use this for user-wide preferences such as themes, providers and keybindings
-  "theme": "opencode",
+  "theme": "github",
   "autoupdate": "notify",
   "default_agent": "data-science-brainstormer",
-  "context": {
-    "patterns": [
-      "Quality-first development with strong testing emphasis",
-      "Clean code patterns and architecture prioritized",
-      "uv for package management, not poetry"
-    ],
-    "expertise": {
-      "primary": "Python with scientific computing (numpy/scipy)",
-      "secondary": "Software architecture and design patterns"
-    }
-  },
-  "session": {
-    "defaults": {
-      "ask_before_write": true,
-      "confirm_overwrite": true,
-      "show_progress": true
-    },
-    "interaction": {
-      "clarifying_questions": "enabled",
-      "offer_continue": true
-    }
-  },
   "skills": {
-    "auto_load": [
-      "code-reviewer"
-    ],
     "context": {
       "code-reviewer": {
         "type": "analysis",
         "read_only": true,
         "generates_report": true,
         "scoring": true
+      },
+      "technical-doc-writer": {
+        "type": "generation",
+        "style_guide": "google",
+        "format": "markdown",
+        "maintain_history": true
+      },
+      "tdd-implementation": {
+        "type": "workflow_enforcement",
+        "workflow": "red-green-refactor",
+        "test_runner": "pytest",
+        "strict_mode": true,
+        "on_fail": "halt"
       }
     }
   },
@@ -79,20 +65,51 @@
   },
   "permission": {
     "bash": {
-      "*": "ask",
       "git *": "allow",
-      "rm *": "ask",
       "grep *": "allow",
+      "ls": "allow",
       "uv run pytest *": "allow",
+      "uv run ruff *": "allow",
       "uv run black *": "allow",
+      "uv run flake8 *": "allow",
       "uv run mypy *": "allow",
-      "uv run flake8 *": "allow"
+      "rm *": "ask",
+      "*": "ask"
+    },
+    "edit": {
+      "**/*.py": "allow",
+      "**/*.sql": "allow",
+      "tests/**/*.py": "allow",
+      "docs/**/*.md": "allow",
+      "*.md": "allow",
+      "pyproject.toml": "ask",
+      "uv.lock": "deny",
+      "~/.ssh/**": "deny",
+      "~/.aws/**": "deny",
+      "/etc/**": "deny",
+      "**/.env": "deny",
+      "*": "ask"
+    },
+    "write": {
+      "~/.ssh/**": "deny",
+      "~/.aws/**": "deny",
+      "/etc/**": "deny",
+      "**/.env": "deny",
+      "**/*.py": "allow",
+      "**/*.sql": "allow",
+      "tests/**": "allow",
+      "docs/**": "allow",
+      "output/**": "allow",
+      "*": "ask"
     }
   },
   "watcher": {
     "ignore": [
       "dist/**",
-      ".git/**"
+      ".git/**",
+      "__pycache__/**",
+      ".pytest_cache/**",
+      "htmlcov/**"
     ]
   }
 }

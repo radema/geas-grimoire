@@ -3,6 +3,8 @@ name: documentation-maintainer
 description: Maintains and improves project documentation quality and consistency
 mode: subagent
 temperature: 0.3
+skills:
+  - technical-doc-writer
 tools:
   read: true
   edit: true

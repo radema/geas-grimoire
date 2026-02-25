@@ -1,28 +1,34 @@
 ---
-description: Define requirements, specifics, implementation plan and solution architecture.
+description: Define requirements, specifications, architecture, and step-by-step task plans for a new feature.
 ---
 
-# Bolt-Intent Workflow: Planning & Design
+# Bolt-Intent Workflow: Specification & Design
 
-This workflow transitions from a vague idea to an implementation-ready design.
+This workflow bridges the gap between a vague idea or chat discussion and a deterministic, implementation-ready plan. It establishes the "Orchestration Layer" for the Bolt.
 
-## 1. Requirement Gathering (Product Owner)
-1. Invoke the `brainstorming` skill to explore user intent and constraints.
-2. **Question Bundling**: Ask groups of related questions to refine the feature scope efficiently.
-3. Identify success criteria and "Out of Scope" items.
+## 1. Setup & Context Gathering
+1. **Understand Intent**: Analyze the user's request from the chat. Use the `brainstorming` skill if requirements or features are ambiguous.
+2. **Create Workspace**: Create a dedicated folder for the feature: `.bolts/BOLT-XXX-<shortname>/`.
+3. *(Optional)* **Requirements Doc**: If the user provides extensive business requirements, generate `.bolts/BOLT-XXX-<shortname>/requirements.md` (status: `draft`). Otherwise, rely on the chat context.
 
-## 2. Workspace Setup
-1. Identify or create the dedicated task folder: `.bolts/<bolt-id>/`.
-2. All subsequent documents for this bolt MUST stay within this folder.
-3. This folder and its content has to be committed only if explicitly requested by the user. 
+## 2. Specification & Design
+Draft the core technical documents. Present each to the user for review before proceeding.
+1. **Draft `spec.md`**: Define the technical specifications, User Stories, and explicit Acceptance Criteria (AC). Include frontmatter: `status: draft`.
+2. **Draft `architecture.md` (or ADR)**: Define interface contracts, data models, necessary tools/libraries, and architectural patterns. Include frontmatter: `status: draft`.
+3. **Validate**: Ask the user to review. Once approved, update frontmatter to `status: approved`.
 
-## 3. Specification & Documentation (Product Owner / Architect)
-1. Use `doc-coauthoring` to draft the Specification in `.bolts/<bolt-id>/spec.md`.
-2. Define user stories and acceptance criteria (AC).
+## 3. Execution Planning (The Plan)
+Determine how the executing agent will build the specification.
+1. **Analyze Complexity**: Review the approved `spec.md` and `architecture.md`.
+2. **Generate `plan.md`**:
+   - Every Bolt gets a `plan.md` file (frontmatter `status: draft`).
+   - Give each step or task a clear Definition of Done. Recommend TDD (Test-Driven Development) where applicable to verify Acceptance Criteria, but allow flexibility if it's overkill for the specific task.
+   - **If the Bolt is Simple**: Write the atomic steps directly inside `plan.md`.
+   - **If the Bolt is Complex**: 
+     - Create a Mermaid state/flow diagram inside `plan.md` mapping the execution dependencies (e.g., `TASK-1 --> TASK-2`).
+     - Create a `tasks/` subfolder.
+     - Generate an atomic `.md` file for each task (e.g., `tasks/task-01-database.md`).
+3. **Validate**: Present the plan to the user. Once approved, update frontmatter to `status: approved`. 
 
-## 4. Technical Architecture & Planning (Architect)
-1. Define interface contracts and save ADRs to `.bolts/<bolt-id>/adr/`.
-2. Invoke `writing-plans` to create the implementation plan in `.bolts/<bolt-id>/plan.md`.
-3. **Incremental Strategy**: For large tasks, break the plan into "Macro-Milestones" that each end with a `bolt-verify` stage.
-
-**Checkpoint**: The workflow is complete when the user approves the plan in the bolt folder.
+---
+**Next Steps**: The Bolt is now ready for implementation. The user can invoke `bolt-implementation` or continue in a new chat.

@@ -39,7 +39,7 @@ def load_palette(palette_arg: str = None, template_dir: Path = None) -> list[str
     """
     if palette_arg:
         return [c.strip() for c in palette_arg.split(",")]
-    
+
     if template_dir:
         palette_file = template_dir / "palette.json"
         if palette_file.exists():
@@ -52,7 +52,7 @@ def load_palette(palette_arg: str = None, template_dir: Path = None) -> list[str
                         return data["colors"]
             except Exception as e:
                 print(f"Warning: Could not load palette.json: {e}")
-    
+
     return None  # Use seaborn default
 
 
@@ -66,10 +66,10 @@ def generate_chart(
     title: str = None,
     hue: str = None,
     figsize: tuple = (10, 6),
-    dpi: int = 150
+    dpi: int = 150,
 ) -> bool:
     """Generate a chart and save to file."""
-    
+
     # Load data
     try:
         if data_path.suffix == ".csv":
@@ -84,7 +84,7 @@ def generate_chart(
     except Exception as e:
         print(f"Error loading data: {e}")
         return False
-    
+
     # Validate columns
     if x_col and x_col not in df.columns:
         print(f"Error: Column '{x_col}' not found. Available: {list(df.columns)}")
@@ -92,25 +92,31 @@ def generate_chart(
     if y_col and y_col not in df.columns:
         print(f"Error: Column '{y_col}' not found. Available: {list(df.columns)}")
         return False
-    
+
     # Set style
     sns.set_theme(style="whitegrid")
     if palette:
         sns.set_palette(palette)
-    
+
+    # Validate chart type before creating figure
+    if chart_type not in SUPPORTED_CHART_TYPES:
+        print(f"Unsupported chart type: {chart_type}")
+        print(f"Supported types: {SUPPORTED_CHART_TYPES}")
+        return False
+
     # Create figure
     fig, ax = plt.subplots(figsize=figsize)
-    
+
     try:
         if chart_type == "line":
             sns.lineplot(data=df, x=x_col, y=y_col, hue=hue, ax=ax, marker="o")
-        
+
         elif chart_type == "bar":
             sns.barplot(data=df, x=x_col, y=y_col, hue=hue, ax=ax)
-        
+
         elif chart_type == "scatter":
             sns.scatterplot(data=df, x=x_col, y=y_col, hue=hue, ax=ax, s=100)
-        
+
         elif chart_type == "area":
             # Area chart using matplotlib fill_between
             if hue:
@@ -121,133 +127,91 @@ def generate_chart(
                 ax.fill_between(df[x_col], df[y_col], alpha=0.6)
             ax.set_xlabel(x_col)
             ax.set_ylabel(y_col)
-        
+
         elif chart_type == "pie":
             # Pie chart
-            plt.close(fig)
-            fig, ax = plt.subplots(figsize=figsize)
             colors = palette if palette else None
             ax.pie(df[y_col], labels=df[x_col], autopct="%1.1f%%", colors=colors)
             ax.axis("equal")
-        
+            ax.grid(False)  # Ensure no grid for pie charts
+
         elif chart_type == "heatmap":
             # Pivot data for heatmap
-            plt.close(fig)
-            fig, ax = plt.subplots(figsize=figsize)
             pivot = df.pivot_table(values=y_col, index=x_col, aggfunc="mean")
             sns.heatmap(pivot, annot=True, fmt=".1f", ax=ax, cmap="Blues")
-        
+
         elif chart_type == "box":
             sns.boxplot(data=df, x=x_col, y=y_col, hue=hue, ax=ax)
-        
-        else:
-            print(f"Unsupported chart type: {chart_type}")
-            print(f"Supported types: {SUPPORTED_CHART_TYPES}")
-            return False
-        
+
         # Add title if provided
         if title:
             ax.set_title(title, fontsize=14, fontweight="bold")
-        
+
         # Rotate x labels if needed
         if chart_type not in ["pie", "heatmap"]:
             plt.xticks(rotation=45, ha="right")
-        
+
         # Tight layout
         plt.tight_layout()
-        
+
         # Save
         output_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output_path, dpi=dpi, bbox_inches="tight", facecolor="white")
-        plt.close(fig)
-        
+
         print(f"✅ Chart saved to: {output_path}")
         return True
-        
+
     except Exception as e:
         print(f"Error generating chart: {e}")
-        plt.close(fig)
         return False
+    finally:
+        plt.close(fig)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate styled charts using Seaborn"
-    )
+    parser = argparse.ArgumentParser(description="Generate styled charts using Seaborn")
     parser.add_argument(
-        "--type", "-t",
+        "--type",
+        "-t",
         required=True,
         choices=SUPPORTED_CHART_TYPES,
-        help=f"Chart type: {SUPPORTED_CHART_TYPES}"
+        help=f"Chart type: {SUPPORTED_CHART_TYPES}",
     )
     parser.add_argument(
-        "--data", "-d",
-        required=True,
-        help="Data file (CSV, Excel, or JSON)"
+        "--data", "-d", required=True, help="Data file (CSV, Excel, or JSON)"
+    )
+    parser.add_argument("--x", required=True, help="X-axis column name")
+    parser.add_argument("--y", required=True, help="Y-axis column name")
+    parser.add_argument("--output", "-o", required=True, help="Output image path")
+    parser.add_argument(
+        "--palette", help="Comma-separated hex colors (e.g., '#1a73e8,#34a853')"
     )
     parser.add_argument(
-        "--x",
-        required=True,
-        help="X-axis column name"
+        "--template-dir", help="Template directory to look for palette.json"
+    )
+    parser.add_argument("--title", help="Chart title")
+    parser.add_argument("--hue", help="Column for color grouping")
+    parser.add_argument(
+        "--width", type=float, default=10, help="Figure width in inches"
     )
     parser.add_argument(
-        "--y",
-        required=True,
-        help="Y-axis column name"
+        "--height", type=float, default=6, help="Figure height in inches"
     )
-    parser.add_argument(
-        "--output", "-o",
-        required=True,
-        help="Output image path"
-    )
-    parser.add_argument(
-        "--palette",
-        help="Comma-separated hex colors (e.g., '#1a73e8,#34a853')"
-    )
-    parser.add_argument(
-        "--template-dir",
-        help="Template directory to look for palette.json"
-    )
-    parser.add_argument(
-        "--title",
-        help="Chart title"
-    )
-    parser.add_argument(
-        "--hue",
-        help="Column for color grouping"
-    )
-    parser.add_argument(
-        "--width",
-        type=float,
-        default=10,
-        help="Figure width in inches"
-    )
-    parser.add_argument(
-        "--height",
-        type=float,
-        default=6,
-        help="Figure height in inches"
-    )
-    parser.add_argument(
-        "--dpi",
-        type=int,
-        default=150,
-        help="Output DPI"
-    )
-    
+    parser.add_argument("--dpi", type=int, default=150, help="Output DPI")
+
     args = parser.parse_args()
-    
+
     data_path = Path(args.data)
     output_path = Path(args.output)
     template_dir = Path(args.template_dir) if args.template_dir else None
-    
+
     if not data_path.exists():
         print(f"Error: Data file not found: {data_path}")
         sys.exit(1)
-    
+
     # Load palette
     palette = load_palette(args.palette, template_dir)
-    
+
     success = generate_chart(
         chart_type=args.type,
         data_path=data_path,
@@ -258,9 +222,9 @@ def main():
         title=args.title,
         hue=args.hue,
         figsize=(args.width, args.height),
-        dpi=args.dpi
+        dpi=args.dpi,
     )
-    
+
     sys.exit(0 if success else 1)
 
 

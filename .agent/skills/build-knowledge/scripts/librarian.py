@@ -42,13 +42,17 @@ class KnowledgeGraphTool:
         """Cheap NLTK synonym expansion"""
         if not wordnet:
             return keywords
-        expanded = set(keywords)
-        for k in keywords:
+        # Filter out empty or whitespace-only strings
+        unique_keywords = {k.strip() for k in keywords if k and k.strip()}
+        expanded = set(unique_keywords)
+        for k in unique_keywords:
             try:
-                for syn in wordnet.synsets(k):
-                    for lemma in syn.lemmas():
-                        expanded.add(lemma.name().replace("_", " "))
-            except:  # noqa: E722
+                expanded.update(
+                    lemma.name().replace("_", " ")
+                    for syn in wordnet.synsets(k)
+                    for lemma in syn.lemmas()
+                )
+            except Exception:
                 pass
         return list(expanded)
 
@@ -57,8 +61,13 @@ class KnowledgeGraphTool:
     def search_notes(self, keywords: list):
         """Finds files containing keywords (using grep)"""
         self.current_step += 1
-        all_terms = self._expand_synonyms(keywords)
-        pattern = "|".join(all_terms)
+        # Filter terms to ensure no empty strings are used in the regex pattern
+        all_terms = [t for t in self._expand_synonyms(keywords) if t]
+        if not all_terms:
+            return "Error: No valid keywords provided."
+
+        # Escape keywords for safe regex usage in grep -E
+        pattern = "|".join(map(re.escape, all_terms))
 
         # grep -r -i -l (recursive, case-insensitive, filename only)
         # Fix: handle cases where pattern might be empty or problematic

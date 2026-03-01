@@ -58,14 +58,19 @@ class KnowledgeGraphTool:
         """Finds files containing keywords (using grep)"""
         self.current_step += 1
         all_terms = self._expand_synonyms(keywords)
-        pattern = "|".join(all_terms)
 
-        # grep -r -i -l (recursive, case-insensitive, filename only)
-        # Fix: handle cases where pattern might be empty or problematic
-        if not pattern:
+        # Security: Escape keywords and filter out empty strings to prevent regex injection
+        escaped_terms = [re.escape(term) for term in all_terms if term]
+
+        if not escaped_terms:
             return "Error: No keywords provided."
 
-        cmd = ["grep", "-r", "-i", "-l", "-E", pattern, self.storage_folder]
+        pattern = "|".join(escaped_terms)
+
+        # grep -r -i -l (recursive, case-insensitive, filename only)
+        # Use -e to explicitly specify the pattern (handles patterns starting with -)
+        # Use -- to separate options from the path
+        cmd = ["grep", "-r", "-i", "-l", "-E", "-e", pattern, "--", self.storage_folder]
 
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)

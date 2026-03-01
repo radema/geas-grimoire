@@ -57,11 +57,16 @@ class KnowledgeGraphTool:
     def search_notes(self, keywords: list):
         """Finds files containing keywords (using grep)"""
         self.current_step += 1
-        all_terms = self._expand_synonyms(keywords)
-        pattern = "|".join(all_terms)
+        # Filter out empty or whitespace-only keywords
+        valid_keywords = [k.strip() for k in keywords if k and k.strip()]
+        if not valid_keywords:
+            return "Error: No valid keywords provided."
+
+        all_terms = self._expand_synonyms(valid_keywords)
+        # Escape keywords for safe grep usage
+        pattern = "|".join(re.escape(term) for term in all_terms)
 
         # grep -r -i -l (recursive, case-insensitive, filename only)
-        # Fix: handle cases where pattern might be empty or problematic
         if not pattern:
             return "Error: No keywords provided."
 

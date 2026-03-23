@@ -1,35 +1,89 @@
 ---
 name: bolt-intent
-description: Define requirements, specifications, architecture, and step-by-step task plans for a new feature.
+description: Define requirements, specifications, architecture, and step-by-step task plans for a new feature. Includes mandatory clarification loop and optional research gate before architecture is authored.
 ---
 
 # Bolt-Intent Workflow: Specification & Design
 
-This workflow bridges the gap between a vague idea or chat discussion and a deterministic, implementation-ready plan. It establishes the "Orchestration Layer" for the Bolt.
+This workflow bridges the gap between a vague idea and a deterministic, implementation-ready plan. It is structured in two phases with a mandatory clarification loop and an optional research gate, ensuring that architecture decisions are made on resolved, evidence-backed requirements — never on assumptions.
+
+## 0. Prerequisites
+Before starting, verify:
+- `.bolts/constitution.md` exists and has `status: approved`. If not, invoke `bolt-constitution` first.
+- A `strategy-map.md` exists (from `bolt-roadmap`) or the user has a clear, scoped objective for this Bolt.
 
 ## 1. Setup & Context Gathering
-1. **Understand Intent**: Analyze the user's request from the chat. Use the `brainstorming` skill if requirements or features are ambiguous.
-2. **Create Workspace**: Create a dedicated folder for the feature: `.bolts/BOLT-XXX-<shortname>/`.
-3. *(Optional)* **Requirements Doc**: If the user provides extensive business requirements, generate `.bolts/BOLT-XXX-<shortname>/requirements.md` (status: `draft`). Otherwise, rely on the chat context.
-
-## 2. Specification & Design
-Draft the core technical documents. Present each to the user for review before proceeding.
-1. **Draft `spec.md`**: Define the technical specifications, User Stories, and explicit Acceptance Criteria (AC). Include frontmatter: `status: draft`.
-2. **Draft `architecture.md` (or ADR)**: Define interface contracts, data models, necessary tools/libraries, and architectural patterns. Include frontmatter: `status: draft`.
-3. **Validate**: Ask the user to review. Once approved, update frontmatter to `status: approved`.
-
-## 3. Execution Planning (The Plan)
-Determine how the executing agent will build the specification.
-1. **Analyze Complexity**: Review the approved `spec.md` and `architecture.md`.
-2. **Generate `plan.md`**:
-   - Every Bolt gets a `plan.md` file (frontmatter `status: draft`).
-   - Give each step or task a clear Definition of Done. Recommend TDD (Test-Driven Development) where applicable to verify Acceptance Criteria, but allow flexibility if it's overkill for the specific task.
-   - **If the Bolt is Simple**: Write the atomic steps directly inside `plan.md`.
-   - **If the Bolt is Complex**: 
-     - Create a Mermaid state/flow diagram inside `plan.md` mapping the execution dependencies (e.g., `TASK-1 --> TASK-2`).
-     - Create a `tasks/` subfolder.
-     - Generate an atomic `.md` file for each task (e.g., `tasks/task-01-database.md`).
-3. **Validate**: Present the plan to the user. Once approved, update frontmatter to `status: approved`. 
+1. **Understand Intent**: Analyze the user's request. Use the `brainstorming` skill if the goal, scope, or constraints are ambiguous. Do not proceed until you have a clear, scoped objective.
+2. **Create Workspace**: Create `.bolts/BOLT-XXX-<shortname>/`.
+3. *(Optional)* **Requirements Doc**: If the user provides extensive business requirements, generate `requirements.md` (`status: draft`) in the Bolt folder. Otherwise, rely on chat context.
 
 ---
-**Next Steps**: The Bolt is now ready for implementation. The user can invoke `bolt-implementation` or continue in a new chat.
+
+## Phase 1: Spec & Clarification
+
+### 1.1 Draft `spec.md`
+Write `.bolts/BOLT-XXX-<shortname>/spec.md` (`status: draft`).
+
+**The spec describes WHAT and WHY — never HOW.**
+Do not include technology names, library choices, API structures, or implementation patterns. Those belong in `architecture.md`.
+
+The spec must contain:
+- **User Stories**: Prioritized (P1, P2, P3). Each story must be independently testable and viable as a standalone MVP slice.
+  - Format: *"As a [role], I want [goal] so that [value]."*
+  - Each story includes Given/When/Then acceptance scenarios.
+- **Functional Requirements**: Numbered `FR-001`, `FR-002`, etc. Each must be testable and unambiguous.
+  - Mark any unclear item immediately: `[NEEDS CLARIFICATION: <specific question>]`. Do not guess or assume.
+- **Edge Cases & Error Scenarios**: Boundary conditions, failure modes, and degraded-state behaviors.
+- **Success Criteria**: Numbered `SC-001`, `SC-002`, etc. Each criterion must be measurable and technology-agnostic.
+  - Example: *"SC-001: 95th-percentile response time under 200ms at 100 concurrent users"* — not *"SC-001: API is fast"*.
+
+### 1.2 Clarification Loop (Mandatory)
+Before Phase 2 can begin, `spec.md` must have zero `[NEEDS CLARIFICATION]` markers.
+
+1. Scan the draft spec for every `[NEEDS CLARIFICATION]` marker.
+2. Present all open questions to the user in a single consolidated list.
+3. Incorporate the answers into the spec — rewrite affected FR-NNN entries to be concrete and unambiguous.
+4. Repeat until zero markers remain.
+5. Update `spec.md` frontmatter to `status: approved`.
+
+> **Gate**: Do not proceed to Phase 2 until `spec.md` has `status: approved`.
+
+---
+
+## Phase 2: Research Gate → Architecture → Plan
+
+### 2.1 Research Gate
+Read `constitution.md` and the approved `spec.md`. Determine whether new technology decisions are required.
+
+**Invoke `bolt-research` if the Bolt**:
+- Requires a new library or framework choice not covered by `constitution.md`.
+- Introduces an external service integration not yet used in the project.
+- Has performance SLAs (SC-NNN) that need validated evidence.
+- Introduces a security-sensitive pattern not covered by the constitution.
+
+**Skip `bolt-research` if** the Bolt purely extends an established pattern in the codebase. Document the skip in one line in `plan.md`: *"Research skipped — Bolt extends existing [pattern]. Constitution and architecture.md govern all choices."*
+
+### 2.2 Draft `architecture.md`
+Write `.bolts/BOLT-XXX-<shortname>/architecture.md` (`status: draft`).
+
+**The architecture describes HOW — every choice must be justified.**
+- Reference `RD-NNN` entries from `research.md` for every technology choice (if research was run).
+- Reference `constitution.md` article numbers for every constraint applied.
+- Define: interface contracts, data models, component interactions, tools/libraries selected, and architectural patterns.
+
+### 2.3 Draft `plan.md`
+Write `.bolts/BOLT-XXX-<shortname>/plan.md` (`status: draft`).
+
+- Give each task a clear Definition of Done traceable to at least one FR-NNN or SC-NNN.
+- Mark tasks that have no dependencies on other tasks as `[P]` (parallelizable).
+- Recommend TDD where applicable to verify Acceptance Criteria; allow flexibility if it is overkill for the specific task.
+- **If the Bolt is Simple**: Write atomic steps directly inside `plan.md`.
+- **If the Bolt is Complex**:
+  - Create a Mermaid flow diagram inside `plan.md` mapping execution dependencies (`TASK-1 --> TASK-2`).
+  - Create a `tasks/` subfolder with one `.md` file per task (e.g., `tasks/task-01-database.md`).
+
+### 2.4 Validate Phase 2
+Present `architecture.md` and `plan.md` to the user for review. Once approved, update both to `status: approved`.
+
+---
+**Next Steps**: The Bolt is ready for implementation. Invoke `bolt-implementation`. For complex Bolts with `[P]`-marked tasks, consider `dispatching-parallel-agents`.

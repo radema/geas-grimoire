@@ -1,0 +1,15 @@
+# Code Duplication Analysis Report
+
+**Method:** Pylint duplicate-code check
+**Configuration:** `min-similarity-lines=4`
+**Scope:** `skills/` directory
+
+## Summary
+No code duplication was found in the repository. The codebase appears to be clean of copy-pasted blocks of 4 lines or more.
+
+## Verification
+To verify the detection tool, a temporary copy of `skills/build-knowledge/scripts/librarian.py` was created. Pylint successfully identified duplication between the original and the copy. The copy was then removed, and the final scan (below) shows zero duplicates.
+
+## Raw Pylint Output
+-------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 9.98/10, +0.02)

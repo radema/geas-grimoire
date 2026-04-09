@@ -16,7 +16,13 @@ This workflow covers the active development phase of a single Bolt. It transitio
 ## 2. The Execution Bounds (Crucial Directives)
 - **Stop on Blockers**: If you encounter an unexpected system constraint (e.g., a missing library, an impossible requirement that contradicts the codebase), **STOP immediately**. Log the blocker in `implementation_decisions.md` and ask the user for clarification or an architectural pivot before writing any code.
 - **One Step at a Time (Sequential Tasks)**: Execute tasks in dependency order per `plan.md`. Do not start the next task until the current one is fully validated and the user has reviewed the progress.
-- **Parallel Tasks `[P]`**: Tasks marked `[P]` in `plan.md` have no dependencies on each other and may be dispatched simultaneously. Use the `dispatching-parallel-agents` skill to delegate independent `[P]` tasks to parallel sub-agents when the Bolt has 2 or more consecutive `[P]` tasks.
+- **Parallel Tasks `[P]`**: Tasks marked `[P]` in `plan.md` have no dependencies on each other and may be dispatched simultaneously as parallel sub-agents. Before dispatching, run this checklist:
+  - [ ] No two `[P]` tasks modify the same file — if they do, consolidate into one agent and log as `ID-NNN | Decision: Merged TASK-XX and TASK-YY | Rationale: Both modify <file>`
+  - [ ] Each agent prompt is self-contained: explicit scope, goal, constraints, and expected output format
+  - [ ] Relevant file paths and context are pasted directly into each prompt — agents do not inherit session context
+  - [ ] Output is specified concretely ("Return a summary of root cause and changes made" — not "fix it")
+
+  Avoid: too-broad scope, missing file context, no constraints on what not to touch, vague output requests.
 - **Traceability**: Every piece of implementation must be traceable to at least one FR-NNN requirement or SC-NNN success criterion from `spec.md`. If code cannot be traced to either, question whether it belongs in this Bolt.
 
 ## 3. The Execution Loop (Task by Task)

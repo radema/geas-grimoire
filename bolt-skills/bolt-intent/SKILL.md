@@ -5,12 +5,20 @@ description: Define requirements, specifications, architecture, and step-by-step
 
 # Bolt-Intent Workflow: Specification & Design
 
-This workflow bridges the gap between a vague idea and a deterministic, implementation-ready plan. It is structured in two phases with a mandatory clarification loop and an optional research gate, ensuring that architecture decisions are made on resolved, evidence-backed requirements — never on assumptions.
-
 ## 0. Prerequisites
 Before starting, verify:
 - `.bolts/constitution.md` exists and has `status: approved`. If not, invoke `bolt-constitution` first.
 - A `strategy-map.md` exists (from `bolt-roadmap`) or the user has a clear, scoped objective for this Bolt.
+
+## 0.5 Spec Pre-flight
+Before executing Phase 1, detect whether the spec work is already done:
+
+1. **Approved spec on disk** — If `.bolts/BOLT-XXX-<shortname>/spec.md` already exists with `status: approved`: skip Phase 1 entirely. Proceed directly to Phase 2.
+2. **Pre-written requirements document supplied** — If the user provides any `.md` document that already contains numbered FR-NNN / SC-NNN entries with zero `[NEEDS CLARIFICATION]` markers: adopt it as `spec.md` (`status: approved`), adapting formatting if needed. Skip Phase 1. Proceed directly to Phase 2.
+   - If the supplied document contains unresolved markers, use it as the draft basis for Phase 1.1 (do not start from scratch).
+3. **Draft spec with no open markers** — If `spec.md` exists with `status: draft` and a full scan finds zero `[NEEDS CLARIFICATION]` markers: promote to `status: approved` and skip to Phase 2.
+
+If none of these conditions apply, proceed with Phase 1 as normal.
 
 ## 1. Setup & Context Gathering
 1. **Understand Intent**: Analyze the user's request. Use the `brainstorming` skill if the goal, scope, or constraints are ambiguous. Do not proceed until you have a clear, scoped objective.

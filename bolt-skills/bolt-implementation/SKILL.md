@@ -23,6 +23,10 @@ This workflow covers the active development phase of a single Bolt. It transitio
   - [ ] Output is specified concretely ("Return a summary of root cause and changes made" — not "fix it")
 
   Avoid: too-broad scope, missing file context, no constraints on what not to touch, vague output requests.
+- **Model Routing**: Each task heading may carry a complexity annotation. Resolve it to a model tier before dispatching or executing the task:
+  - `[trivial]` / `[low]` → haiku
+  - `[medium]` → sonnet (default when no annotation is present)
+  - `[high]` → opus — **stop and ask the user for confirmation before proceeding**; opus incurs significant cost and requires a MAX plan
 - **Traceability**: Every piece of implementation must be traceable to at least one FR-NNN requirement or SC-NNN success criterion from `spec.md`. If code cannot be traced to either, question whether it belongs in this Bolt.
 
 ## 3. The Execution Loop (Task by Task)

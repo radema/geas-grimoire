@@ -84,11 +84,21 @@ Write `.bolts/BOLT-XXX-<shortname>/plan.md` (`status: draft`). Initialize from `
 
 - Give each task a clear Definition of Done traceable to at least one FR-NNN or SC-NNN.
 - Mark tasks that have no dependencies on other tasks as `[P]` (parallelizable).
+- Annotate each task with a complexity label (see table below). The label is used by `bolt-implementation` to select the model tier for that task — explicit, overrideable before plan approval.
 - Recommend TDD where applicable to verify Acceptance Criteria; allow flexibility if it is overkill for the specific task.
 - **If the Bolt is Simple**: Write atomic steps directly inside `plan.md`.
 - **If the Bolt is Complex**:
   - Create a Mermaid flow diagram inside `plan.md` mapping execution dependencies (`TASK-1 --> TASK-2`).
   - Create a `tasks/` subfolder with one `.md` file per task (e.g., `tasks/task-01-database.md`).
+
+**Complexity annotation** — add the label in the task heading: `## TASK-01 [P][medium] — Title`
+
+| Label | Default model | When to apply |
+|-------|--------------|---------------|
+| `[trivial]` | haiku | Config changes, renames, single-line edits |
+| `[low]` | haiku | Well-specified edits to a single file, straightforward test writing |
+| `[medium]` | sonnet | Multi-file changes, new logic, function signature changes |
+| `[high]` | opus | Architectural refactors, novel algorithms, ambiguous or underspecified scope |
 
 ### 2.4 Validate Phase 2
 Present `architecture.md` and `plan.md` to the user for review. Once approved, update both to `status: approved`.

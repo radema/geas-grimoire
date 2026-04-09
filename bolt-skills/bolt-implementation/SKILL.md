@@ -31,7 +31,7 @@ For each task in the plan:
 2. *(Optional)* **TDD Delegation**: If TDD is required by `constitution.md` or appropriate for establishing contracts, invoke the `test-driven-development` skill to write and verify tests against the relevant FR-NNN / SC-NNN criteria before writing source code.
 3. **Write Implementation**: Write the code required to fulfill the task's Definition of Done and architecture contracts.
 4. **Fast Deterministic Evals**: Aggressively verify assumptions. Run linters, syntax checks, compiler checks, or unit tests locally *before* presenting the work.
-5. **Log Deviations**: If you deviate from `architecture.md` or `plan.md`, log the decision immediately in `implementation_decisions.md` using the format:
+5. **Log Deviations**: If you deviate from `architecture.md` or `plan.md`, log the decision immediately in `implementation_decisions.md` (initialize from `bolt-implementation/templates/implementation_decisions.md` if not yet created) using the format:
    - `ID-NNN | Phase: <phase> | Files: <files> | Decision: <what changed> | Rationale: <why>`
 6. **Mark Complete**: Once the Definition of Done is met and evals pass, update the task frontmatter to `status: complete`.
 7. **User Review**: Pause execution. Ask the user for a review of the completed task before moving to the next step in the dependency sequence.

@@ -30,7 +30,7 @@ If none of these conditions apply, proceed with Phase 1 as normal.
 ## Phase 1: Spec & Clarification
 
 ### 1.1 Draft `spec.md`
-Write `.bolts/BOLT-XXX-<shortname>/spec.md` (`status: draft`).
+Write `.bolts/BOLT-XXX-<shortname>/spec.md` (`status: draft`). Initialize from `bolt-intent/templates/spec-feature.md` (feature Bolt) or `spec-bugfix.md` (bug-fix/root-cause Bolt).
 
 **The spec describes WHAT and WHY — never HOW.**
 Do not include technology names, library choices, API structures, or implementation patterns. Those belong in `architecture.md`.
@@ -72,7 +72,7 @@ Read `constitution.md` and the approved `spec.md`. Determine whether new technol
 **Skip `bolt-research` if** the Bolt purely extends an established pattern in the codebase. Document the skip in one line in `plan.md`: *"Research skipped — Bolt extends existing [pattern]. Constitution and architecture.md govern all choices."*
 
 ### 2.2 Draft `architecture.md`
-Write `.bolts/BOLT-XXX-<shortname>/architecture.md` (`status: draft`).
+Write `.bolts/BOLT-XXX-<shortname>/architecture.md` (`status: draft`). Initialize from `bolt-intent/templates/architecture.md`.
 
 **The architecture describes HOW — every choice must be justified.**
 - Reference `RD-NNN` entries from `research.md` for every technology choice (if research was run).
@@ -80,7 +80,7 @@ Write `.bolts/BOLT-XXX-<shortname>/architecture.md` (`status: draft`).
 - Define: interface contracts, data models, component interactions, tools/libraries selected, and architectural patterns.
 
 ### 2.3 Draft `plan.md`
-Write `.bolts/BOLT-XXX-<shortname>/plan.md` (`status: draft`).
+Write `.bolts/BOLT-XXX-<shortname>/plan.md` (`status: draft`). Initialize from `bolt-intent/templates/plan.md`.
 
 - Give each task a clear Definition of Done traceable to at least one FR-NNN or SC-NNN.
 - Mark tasks that have no dependencies on other tasks as `[P]` (parallelizable).

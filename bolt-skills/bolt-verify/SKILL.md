@@ -32,7 +32,7 @@ Perform a detailed review of the implementation.
 
 ## 4. The Merge Request Package (MRP)
 Prepare the final artifacts for human review.
-1. **Create `mrp.md`**: Generate `.bolts/BOLT-XXX-<shortname>/mrp.md`.
+1. **Create `mrp.md`**: Generate `.bolts/BOLT-XXX-<shortname>/mrp.md`. Initialize from `bolt-verify/templates/mrp.md`.
    - For highly complex Bolts, create an `mrp/` folder to store screenshots, logs, or extensive evidence.
 2. **Structure the MRP**:
    - **Summary**: High-level overview of what was built and how it matched `spec.md`.

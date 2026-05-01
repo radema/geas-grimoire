@@ -35,7 +35,7 @@ Generate `docs/design/retrospective-YYYY-MM-DD.md` (for batch reviews) or `docs/
 
 ```
 ---
-scope: [BOLT-XXX, BOLT-YYY, ...]   # Bolts reviewed
+scope: [feature-name, other-feature, ...]   # Features reviewed
 date: YYYY-MM-DD
 status: draft
 ---

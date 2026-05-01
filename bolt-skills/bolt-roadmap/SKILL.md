@@ -39,7 +39,7 @@ Create the specific deliverables.
 Generate a markdown file (e.g., `docs/design/strategy-map.md` or a phase-specific roadmap like `docs/design/roadmap-phase2.md`):
 - **Project Goal**: Concise summary.
 - **Architectural Standards**: The agreed-upon technical constraints (reference `constitution.md` articles where applicable).
-- **The Roadmap**: A list of Bolts (e.g., `BOLT-001-setup`, `BOLT-002-api`), grouped by Stream.
+- **The Roadmap**: A list of features (e.g., `setup`, `api-auth`), grouped by Stream.
 - **Tagging**: Mark each Bolt explicitly as `[SEQUENTIAL]` or `[PARALLELABLE]`.
 - **Description**: Provide a 1-sentence description of the Bolt's output.
 

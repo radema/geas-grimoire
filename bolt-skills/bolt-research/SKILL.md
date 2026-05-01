@@ -34,7 +34,7 @@ Generate `docs/research/<topic>.md`. Initialize from `bolt-research/templates/re
 
 ```
 ---
-bolt: BOLT-XXX-<shortname>
+feature: <feature-name>
 status: complete
 ---
 

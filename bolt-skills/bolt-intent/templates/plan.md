@@ -10,8 +10,12 @@ flowchart TD
 ### TASK-01 [medium] — <Title>
 **DoD:** <Deliverable. Traces: FR-001, SC-001.>
 
-1.  <Step>
-2.  <Step>
+**File Changes:**
+- `path/to/file.py`: <Rationale for change/creation>
+
+**Step-by-Step:**
+1.  <Detail instruction>
+2.  <Detail instruction>
 
 ## Verification (SC Coverage)
 | SC | How Verified |

@@ -15,6 +15,11 @@ This workflow covers the active development phase. You are the "Goldfish"—your
      `python bolt-skills/scripts/bolt_parser.py docs/design/<workspace>/spec.md --section "Interfaces & Constraints"`
      Pay absolute attention to this output.
 3. **Constitution Check**: Briefly review `docs/design/constitution.md` for global repository invariants.
+4. **Goldfish Readiness Audit (Mandatory)**: Before starting implementation, you must perform a three-phase self-audit of the `spec.md` and `plan.md` to ensure they are sufficient.
+   - **Phase A: System Understanding**: Read the design docs and referenced files. Explain in your own words what the feature is trying to accomplish and how the system currently works as it relates to this feature.
+   - **Phase B: Expert Review**: Assume the role of an expert technical reviewer. Identify everything the design doc missed: faulty assumptions, missing edge cases, and architectural oversights. Every ambiguity you find makes you more useful.
+   - **Phase C: Implementability Check**: Declare as an experienced software engineer whether you have *absolutely* all the information required to successfully implement this feature in your first pass. 
+   - **Gate**: If you fail any phase or find ambiguities, you MUST notify the user and request a "Pivot" back to `bolt-intent` to fix the spec before proceeding.
 
 ## 2. The Execution Bounds (HALT & PIVOT)
 - **THE HALT ZONE**: If a task requires you to violate an interface, signature, or rule defined in the `## Interfaces & Constraints` section of `spec.md`, **STOP IMMEDIATELY**.

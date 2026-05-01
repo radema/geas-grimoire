@@ -15,7 +15,10 @@ Before starting, verify:
 2. **Create Workspace**: 
    - For new features: Create `docs/design/<feature-name>/`.
    - For modifications: Create `docs/design/<feature-update>/` (a transient folder for the current branch/PR).
-3. **Continuous Drafting**: Immediately write a draft `spec.md` to the workspace directory using `bolt-intent/templates/spec.md`. Do NOT wait until the end of the conversation to write the file. The file system is your memory; patch it as the conversation evolves.
+3. **Draft Proposal (Critical)**: Based on your understanding of the codebase and the user's initial description, provide a first draft proposal of the technical implementation. 
+   - **Form**: Use clearly written prose and Mermaid block diagrams.
+   - **Content**: Demonstrate your understanding of the system's architecture. Use short blocks of pseudocode only if necessary.
+   - **Continuous Drafting**: Immediately write this into a draft `spec.md` using `bolt-intent/templates/spec.md`. Do NOT wait until the end of the conversation. The file system is your memory.
 
 ---
 
@@ -25,8 +28,11 @@ Before starting, verify:
 Continuously update `docs/design/<workspace>/spec.md` (`status: draft`).
 
 The `spec.md` is the long-term memory (The Elephant). It describes WHAT, WHY, and architectural HOW, as well as strict constraints.
-- **Requirements**: Capture User Stories/Hypothesis, Functional Requirements (FR-001), Edge Cases, and Success Criteria (SC-001).
-- **Architecture & Decisions (ADR)**: Document technical choices. If extensive research is needed, invoke `bolt-research` and link to `[[docs/research/topic.md]]`.
+- **Requirements**: Capture the **Business Problem** (3–5 sentences in plain English for a casual reader), User Stories/Hypothesis, Functional Requirements (FR-001), Edge Cases, and Success Criteria (SC-001).
+- **Architecture & Decisions (ADR)**: Document technical choices. 
+    - Provide a **jargon-light Technical Plan** describing how components fit together. Include a Mermaid block diagram.
+    - **Alternatives**: Explicitly document ideas considered but ruled out, providing guardrails against future hallucinations.
+    - If extensive research is needed, invoke `bolt-research` and link to `[[docs/research/topic.md]]`.
 - **Interfaces & Constraints (HALT ZONE)**: Define rigid rules (API signatures, performance SLAs, backward compatibility, etc.). These are the boundaries the executing agent (Goldfish) cannot cross without human permission.
 
 ### 1.2 Clarification Loop (Mandatory)
@@ -45,7 +51,8 @@ Write `docs/design/<workspace>/plan.md`. Initialize from `bolt-intent/templates/
 This is the transient checklist for the `bolt-implement` agent (The Goldfish).
 - Give each task a clear Definition of Done traceable to an FR-NNN or SC-NNN from `spec.md`.
 - Annotate each task with a complexity label (e.g., `## TASK-01 [medium] — Title`).
-- Detail the specific step-by-step instructions. The more fidelity here, the better the coding agent will perform. Do not use YAML arrays for tasks; write highly detailed markdown steps.
+- **Detailed Implementation Plan**: Provide highly detailed step-by-step instructions. **Enumerate every single file that will be created or changed**, and provide the rationale for why. This is critical for keeping the executor on the rails.
+- Do not use YAML arrays for tasks; write highly detailed markdown steps.
 
 **Complexity annotation** — add the label in the task heading: `## TASK-01 [P][medium] — Title`
 

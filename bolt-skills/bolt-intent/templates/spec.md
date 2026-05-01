@@ -8,8 +8,16 @@ date: YYYY-MM-DD
 ---
 
 # 1. Background & Intent
-*Feature:* <Problem statement and current state>
-*Bugfix:* <Root cause summary and affected pipelines>
+### Business Problem
+<3–5 sentences in plain English describing the problem. Casual reader friendly.>
+
+### Technical Plan
+<Jargon-light description of big components and how they fit together. Explanatory prose.>
+
+```mermaid
+graph TD
+    A[Component A] --> B[Component B]
+```
 
 # 2. Context & Scenarios
 *Feature:* <User Stories (As a... I want...) and Acceptance Scenarios>
@@ -41,3 +49,6 @@ date: YYYY-MM-DD
 
 ### 7.1 <Primary Design Decision Title>
 <HOW. Every choice justified. Reference RD-NNN from research.md if research ran.>
+
+### 7.2 Alternatives Considered
+<Document ideas considered but ruled out. Rationale for rejection. These act as guardrails.>

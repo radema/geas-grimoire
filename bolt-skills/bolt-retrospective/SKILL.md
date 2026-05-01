@@ -31,7 +31,7 @@ Synthesize the evidence into process signals:
 - **Skill effectiveness**: Did any bolt-* skill prompt cause confusion, ambiguity, or incorrect agent behavior?
 
 ## 3. Produce `retrospective.md`
-Generate `.bolts/retrospective-YYYY-MM-DD.md` (for batch reviews) or `.bolts/BOLT-XXX-<shortname>/retrospective.md` (for single-Bolt reviews):
+Generate `docs/design/retrospective-YYYY-MM-DD.md` (for batch reviews) or `docs/design/<feature-name>/retrospective.md` (for single-Bolt reviews):
 
 ```
 ---

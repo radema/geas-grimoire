@@ -9,7 +9,9 @@ This workflow is the final gate before code is considered complete. It validates
 
 ## 1. Context & Setup
 1. **Locate Workspace**: Ask the user for the active feature directory (e.g., `docs/design/<feature-name>/`).
-2. **State Verification**: Open `plan.md` and verify all tasks are complete. Open `spec.md` and load the `## Interfaces & Constraints` (The Halt Zone) and `## Success Criteria`.
+2. **State Verification**: Open `plan.md` and verify all tasks are complete. Use the parser utility to extract the critical validation parameters:
+   `python bolt-skills/scripts/bolt_parser.py docs/design/<workspace>/spec.md --section "Interfaces & Constraints"`
+   `python bolt-skills/scripts/bolt_parser.py docs/design/<workspace>/spec.md --section "Success Criteria"`
 
 ## Phase 1: Deterministic Verify (The Fast Checks)
 Before performing deep analysis, ensure the code structurally works.

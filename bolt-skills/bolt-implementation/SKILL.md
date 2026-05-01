@@ -11,8 +11,10 @@ This workflow covers the active development phase. You are the "Goldfish"—your
 1. **Locate Workspace**: Ask the user for the active feature directory (e.g., `docs/design/<feature-name>/` or `docs/design/<feature-update>/`).
 2. **Skeleton-First Context Loading**: 
    - Read `plan.md` to understand your immediate tasks.
-   - Read `spec.md`, paying absolute attention to the `## Interfaces & Constraints` section. (If the repository contains a `scripts/bolt_parser.py` utility, use it via CLI to extract specific sections to preserve your context window).
-3. **Constitution Check**: Briefly review `.bolts/constitution.md` for global repository invariants.
+   - Run the parser script to extract the constraints without loading the entire `spec.md` into your context window:
+     `python bolt-skills/scripts/bolt_parser.py docs/design/<workspace>/spec.md --section "Interfaces & Constraints"`
+     Pay absolute attention to this output.
+3. **Constitution Check**: Briefly review `docs/design/constitution.md` for global repository invariants.
 
 ## 2. The Execution Bounds (HALT & PIVOT)
 - **THE HALT ZONE**: If a task requires you to violate an interface, signature, or rule defined in the `## Interfaces & Constraints` section of `spec.md`, **STOP IMMEDIATELY**.

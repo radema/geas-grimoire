@@ -8,7 +8,7 @@ description: Create a comprehensive strategic roadmap and diagram for the projec
 This workflow guides the user and agent from a high-level project objective to a fully decomposed execution plan (`strategy-map.md`). It ensures all dependencies are identified, architectural patterns are selected, and the path forward is visually clear. Roadmaps can be created initially or incrementally over time.
 
 ## 0. Prerequisites
-Check for `.bolts/constitution.md`:
+Check for `docs/design/constitution.md`:
 - **If it exists** (status: approved): Read it before the interview. Use its articles to constrain architectural preference questions — do not re-ask what the constitution already answers.
 - **If it does not exist**: Recommend that the user invoke `bolt-constitution` before the roadmap, especially for multi-Bolt initiatives. Proceed without it only if the user explicitly chooses to.
 
@@ -36,7 +36,7 @@ Determine the execution order of the Bolts.
 ## 4. Artifact Generation
 Create the specific deliverables.
 ### 4.1 Create `strategy-map.md`
-Generate a markdown file (e.g., `.bolts/strategy-map.md` or a phase-specific roadmap like `.bolts/roadmap-phase2.md`):
+Generate a markdown file (e.g., `docs/design/strategy-map.md` or a phase-specific roadmap like `docs/design/roadmap-phase2.md`):
 - **Project Goal**: Concise summary.
 - **Architectural Standards**: The agreed-upon technical constraints (reference `constitution.md` articles where applicable).
 - **The Roadmap**: A list of Bolts (e.g., `BOLT-001-setup`, `BOLT-002-api`), grouped by Stream.

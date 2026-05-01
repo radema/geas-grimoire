@@ -7,7 +7,7 @@ description: Define requirements, specifications, architecture, and step-by-step
 
 ## 0. Prerequisites
 Before starting, verify:
-- `.bolts/constitution.md` exists and has `status: approved`. If not, invoke `bolt-constitution` first.
+- `docs/design/constitution.md` exists and has `status: approved`. If not, invoke `bolt-constitution` first.
 - If this is a modification to a pre-existing feature, ensure you read its consolidated design doc in `docs/design/<feature>.md` first.
 
 ## 1. Setup & Context Gathering

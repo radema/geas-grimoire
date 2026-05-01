@@ -30,7 +30,7 @@ For each `RD-NNN`:
 4. **Benchmark Validation**: If performance SLAs apply, locate or produce evidence (published benchmarks, case studies, or quick spikes) that the recommended approach meets them.
 
 ## 3. Produce `research.md`
-Generate `.bolts/BOLT-XXX-<shortname>/research.md`. Initialize from `bolt-research/templates/research.md`. The structure is:
+Generate `docs/research/<topic>.md`. Initialize from `bolt-research/templates/research.md`. The structure is:
 
 ```
 ---

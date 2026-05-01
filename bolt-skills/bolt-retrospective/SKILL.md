@@ -18,7 +18,7 @@ This workflow improves the **development process** — not the project artifacts
 For each Bolt under review, gather the following artifacts:
 1. `plan.md` — compare planned task count and complexity against what actually occurred.
 2. `implementation_decisions.md` — catalogue all runtime deviations and their root causes.
-3. `mrp.md` — note residual risks, known limitations, and rework items that originated in the process.
+3. `audit-report.md` — note residual risks, known limitations, and rework items that originated in the process.
 4. `research.md` (if present) — was research sufficient? Were architecture decisions later revised?
 5. Chat / session context — identify recurring blockers, repeated clarifications, or steps that were skipped.
 

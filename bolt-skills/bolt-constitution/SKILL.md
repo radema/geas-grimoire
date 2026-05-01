@@ -49,7 +49,7 @@ amended: []
 **Rationale**: <why>
 
 ## Article III — Anti-Abstraction
-<Principle statement. e.g.: Use framework features directly. Wrapper layers require explicit justification in the Bolt's architecture.md.>
+<Principle statement. e.g.: Use framework features directly. Wrapper layers require explicit justification in the feature's `spec.md`.>
 **Rationale**: <why>
 
 ## Article IV — Integration-First Testing

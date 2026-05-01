@@ -11,7 +11,7 @@ This workflow runs **between spec approval and architecture authoring** when a B
 `bolt-intent` Phase 2 opens with a **research gate**. The decision is binary and must be documented:
 
 - **Invoke bolt-research when**: the Bolt requires a new library or framework choice; integrates with an external service not yet used in the project; has performance SLAs that need validation; or introduces a security-sensitive pattern not covered by the constitution.
-- **Skip when**: the Bolt purely extends an existing, well-established pattern in the codebase (e.g., adding a new Bronze ingestion table to an existing pipeline). Document the skip reason in one line inside `plan.md`: *"Research skipped — Bolt extends existing [pattern name]. Constitution and architecture.md govern all choices."*
+- **Skip when**: the feature purely extends an existing, well-established pattern in the codebase (e.g., adding a new Bronze ingestion table to an existing pipeline). Document the skip reason in one line inside `plan.md`: *"Research skipped — Feature extends existing [pattern name]. Constitution and master design docs govern all choices."*
 
 ## 1. Scope Definition
 Read `spec.md` (status: approved) and `constitution.md`. Identify every open decision:
@@ -65,8 +65,8 @@ status: complete
 
 ## 4. Handoff to Architecture
 Present `research.md` to the user for acknowledgement.
-Once acknowledged, `bolt-intent` Phase 2 proceeds to authoring `architecture.md`.
-Every technology choice in `architecture.md` **must reference a `RD-NNN` entry** from this document. Choices not traceable to a research decision are flagged as assumptions.
+Once acknowledged, `bolt-intent` Phase 2 proceeds to authoring the **Architecture & Decisions** section in `spec.md`.
+Every technology choice in `spec.md` **must reference a `RD-NNN` entry** from this document. Choices not traceable to a research decision are flagged as assumptions.
 
 ---
-**Next Steps**: Return to `bolt-intent` Phase 2 to author `architecture.md` and `plan.md` using this document as technical input.
+**Next Steps**: Return to `bolt-intent` Phase 2 to author `spec.md` and `plan.md` using this document as technical input.

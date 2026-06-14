@@ -1,23 +1,21 @@
 ---
-bolt: BOLT-XXX
-shortname: <shortname>
+id: <feature-name>
 status: in-review
 date: YYYY-MM-DD
 ---
-# Merge Request Package — BOLT-XXX: <Title>
+# Audit Report: <feature-name>
 
-## Summary
+## 1. Summary
 <2–4 sentences: what was delivered, scope, and outcome.>
 
-## Requirement Coverage
+## 2. Requirement Coverage
 | Requirement | Description | Evidence |
 |-------------|-------------|----------|
 | FR-001 | <Description> | <File:line or test name> |
 | SC-001 | <Description> | <Test output or manual check> |
 
-## Evidence
-
-### Linting
+## 3. Deterministic Evidence (Verify)
+### Linting & Typing
 ```bash
 <ruff / mypy output>
 ```
@@ -27,18 +25,12 @@ date: YYYY-MM-DD
 <pytest output>
 ```
 
-### Code Inspection
-<Key logic verified manually — describe what was checked>
+## 4. Semantic Drift Analysis (Audit)
+| Constraint / Interface | Status | Notes / Drift Identified |
+|------------------------|--------|--------------------------|
+| <Constraint from spec.md> | Pass/Fail | <Details> |
 
-## Deviations
-| ID | Summary | Impact |
-|----|---------|--------|
-| ID-001 | <What deviated from architecture.md> | None / <FR affected> |
-
-## Breaking Changes
-<None. / Describe schema or interface changes.>
-
-## Residual Risks
+## 5. Residual Risks & Technical Debt
 | Risk | Severity | Mitigation |
 |------|----------|------------|
 | <Risk> | Low/Medium/High | <Mitigation> |

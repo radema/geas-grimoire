@@ -18,7 +18,7 @@ This workflow improves the **development process** — not the project artifacts
 For each Bolt under review, gather the following artifacts:
 1. `plan.md` — compare planned task count and complexity against what actually occurred.
 2. `implementation_decisions.md` — catalogue all runtime deviations and their root causes.
-3. `mrp.md` — note residual risks, known limitations, and rework items that originated in the process.
+3. `audit-report.md` — note residual risks, known limitations, and rework items that originated in the process.
 4. `research.md` (if present) — was research sufficient? Were architecture decisions later revised?
 5. Chat / session context — identify recurring blockers, repeated clarifications, or steps that were skipped.
 
@@ -31,11 +31,11 @@ Synthesize the evidence into process signals:
 - **Skill effectiveness**: Did any bolt-* skill prompt cause confusion, ambiguity, or incorrect agent behavior?
 
 ## 3. Produce `retrospective.md`
-Generate `.bolts/retrospective-YYYY-MM-DD.md` (for batch reviews) or `.bolts/BOLT-XXX-<shortname>/retrospective.md` (for single-Bolt reviews):
+Generate `docs/design/retrospective-YYYY-MM-DD.md` (for batch reviews) or `docs/design/<feature-name>/retrospective.md` (for single-Bolt reviews):
 
 ```
 ---
-scope: [BOLT-XXX, BOLT-YYY, ...]   # Bolts reviewed
+scope: [feature-name, other-feature, ...]   # Features reviewed
 date: YYYY-MM-DD
 status: draft
 ---

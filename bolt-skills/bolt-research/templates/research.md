@@ -1,5 +1,5 @@
 ---
-bolt: BOLT-XXX
+feature: <feature-name>
 shortname: <shortname>
 status: complete
 ---

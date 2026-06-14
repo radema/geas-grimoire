@@ -24,7 +24,7 @@ Use the `brainstorming` skill to surface project-level standards. Cover the foll
 Continue the discovery loop until there are **no ambiguities** about the project's non-negotiables.
 
 ## 2. Draft the Constitution
-Generate `.bolts/constitution.md` with the following structure:
+Generate `docs/design/constitution.md` with the following structure:
 
 ```
 ---
@@ -49,7 +49,7 @@ amended: []
 **Rationale**: <why>
 
 ## Article III — Anti-Abstraction
-<Principle statement. e.g.: Use framework features directly. Wrapper layers require explicit justification in the Bolt's architecture.md.>
+<Principle statement. e.g.: Use framework features directly. Wrapper layers require explicit justification in the feature's `spec.md`.>
 **Rationale**: <why>
 
 ## Article IV — Integration-First Testing
@@ -89,7 +89,7 @@ Update frontmatter to `status: approved`.
 ## 4. Amendment Protocol (Re-invocation)
 If `bolt-constitution` is re-invoked on an existing project:
 1. Identify the article(s) to amend and document the proposed change and rationale.
-2. Run an impact assessment: list all `.bolts/BOLT-XXX-*/` directories that may be affected.
+2. Run an impact assessment: list all `docs/design/*/` feature directories that may be affected.
 3. Update the article, increment the version number, and append to the `amended` list.
 4. Notify the user which in-flight Bolts need to be reviewed for compliance.
 

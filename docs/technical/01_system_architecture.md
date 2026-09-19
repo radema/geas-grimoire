@@ -1,63 +1,45 @@
 # System Architecture
 
-## Application Overview
-**geas-grimoire** is a specialized knowledge repository designed to empower AI agents with **Skills**, **Workflows**, and **Rules**. Unlike traditional software applications, this repository functions as a "Grimoire"—a library of modular executable logic and governance protocols that can be dynamically loaded or referenced by an agentic runtime (e.g., Antigravity, OpenCode).
+`geas-grimoire` is not an application. It is a versioned store of Claude Code harness assets —
+skills, subagents, hooks — installed into a device's `~/.claude/` directory.
 
-The core philosophy is the separation of **Capability** (Skills), **Process** (Workflows), and **Identity/Governance** (Rules).
+## Layout
 
-## Technology Stack 
+| Path | Role |
+|---|---|
+| `skills/<category>/<name>/` | One skill per directory. `SKILL.md` required; `scripts/`, `references/`, `templates/`, `assets/` optional. |
+| `agents/` | Subagent definitions (one Markdown file each) plus `retired/`. |
+| `hooks/` | Hook scripts and `settings.reference.json`. |
+| `scripts/` | `link-skills.sh`, `list-skills.sh`, `publish-public.sh`. |
+| `archive/`, `skills/archive/` | Retired material, kept for reference, never installed. |
+| `docs/`, `LICENSES/` | Notes and third-party licence texts. |
 
-### Core Formats
-*   **Markdown (`.md`)**: The primary format for defining instructions, workflows, and rule sets. Optimized for LLM token consumption.
-*   **YAML Frontmatter**: Used for metadata (name, description, tags) to allow programmatic parsing of skills and workflows.
+Categories: `data-engineering`, `engineering`, `experimenting`, `productivity`, `brand`, `archive`.
 
-### Scripting & Automation
-*   **Python 3.x**: Used for the executable logic within Skills (e.g., `technical-doc-writer/scripts/`, `word-doc/scripts/`).
-*   **Bash**: Simple automation scripts.
+## Install model
 
-### Document Generation
-*   **python-docx**: Word document creation and manipulation (`word-doc` skill).
-*   **pyyaml/mistune**: YAML frontmatter parsing and Markdown-to-document conversion.
-*   **seaborn/matplotlib/pandas**: Data visualization for embedded charts.
+Skills are **symlinked**: `~/.claude/skills/<name>` → `skills/<category>/<name>/`. One link per
+skill, so a device installs only the subset it needs. Editing through either path edits the same
+file. A plain directory at the target instead of a symlink means two editable copies and drift —
+`scripts/link-skills.sh` refuses to overwrite one.
 
-### Integrations
-*   **Model Context Protocol (MCP)**: The repository aligns with MCP standards where applicable to expose tools and resources to the agent.
-*   **Agent Runtimes**: Compatible with ClaudeCode, OpenCode, and custom Python agent loops.
+Agents and hooks are **copied** into `~/.claude/agents/` and `~/.claude/hooks/`, because Claude
+Code reads them at startup and they are small and rarely edited. `~/.claude/settings.json` wires
+the hooks; it is not versioned here, but `hooks/settings.reference.json` shows the shape.
 
-## High-Level Architecture Diagram
+`morning-brief` is the one skill not symlinked — see `AGENTS.md`.
 
-The following diagram illustrates how an Agent interacts with the Geas Grimoire components.
+## Two tiers: private and public
 
-```mermaid
-graph TD
-    subgraph "Agent Runtime"
-        Agent[AI Agent / Antigravity]
-        Context[Context Window]
-    end
+This repo is private. It contains company brand skills and configuration referring to private
+work.
 
-    subgraph "Geas Grimoire"
-        Rules[rules/]
-        Skills[skills/]
-        Workflows[workflows/]
-    end
+`scripts/publish-public.sh` produces the payload for the public mirror `radema/geas-grimoire`:
 
-    Rules -->|Governs| Agent
-    Skills -->|Extends Capabilities| Agent
-    Workflows -->|Guides Process| Agent
-    
-    User[User] -->|Invocation/Request| Agent
-    Agent -->|Executes| Skills
-    Agent -->|Follows| Workflows
-    
-    classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px;
-    classDef repo fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    class Agent,Context default;
-    class Rules,Skills,Workflows repo;
-```
+1. **Allowlist** — only named top-level paths are copied. `skills/brand/` is deliberately absent.
+   A short denylist removes paths that sit inside an allowed directory but must still stay private.
+2. **Skipped report** — everything not allowlisted is printed, and the script stops unless `--yes`.
+3. **Denylist scan** — the payload is grepped for brand paths, Jira keys and company email
+   addresses. Any hit aborts the publish. An empty payload is treated as a failure, not a pass.
 
-## Directory Structure Strategy
-The repository implements a flat, modular architecture to minimize cross-dependencies, allowing agents to ingest only the context they need.
-
-*   `rules/`: Global and Persona-specific constraints.
-*   `skills/`: Self-contained tool definitions (Folder = Skill).
-*   `workflows/`: Step-by-step procedural guides.
+The script copies files into an existing checkout; cloning, committing and pushing stay manual.

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ticket-loop state file (.claude/ticket-loop/<story>.json)",
+  "type": "object",
+  "required": ["story", "branch", "base", "review_effort", "max_parallel", "tickets", "trails"],
+  "properties": {
+    "story": { "type": "string", "description": "Jira story key, e.g. ABC-123" },
+    "branch": { "type": "string", "description": "story feature branch, e.g. feat/abc-123-slug; the only branch that becomes a PR" },
+    "base": { "type": "string", "description": "base branch the story branch was cut from (dev/stage)" },
+    "review_effort": { "enum": ["low", "medium", "high"] },
+    "max_parallel": { "type": "integer", "minimum": 1, "description": "cap on concurrently running agents (implementers + reviewers); enforced by ~/.claude/hooks/ticket_loop_cap.sh" },
+    "worktree_root": { "type": "string", "description": "directory holding one worktree per trail, default <repo>/.claude/ticket-loop/wt" },
+    "created": { "type": "string", "format": "date-time" },
+    "tickets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "deps", "status", "complexity"],
+        "properties": {
+          "key": { "type": "string" },
+          "deps": { "type": "array", "items": { "type": "string" }, "description": "ticket keys from the brief's Dipendenze line" },
+          "complexity": { "enum": ["XS", "S", "M", "L"], "description": "from the brief's Complessità line; L is never dispatched" },
+          "trail": { "type": ["string", "null"], "description": "trail id this ticket belongs to (null for needs-split/done)" },
+          "status": { "enum": ["pending", "building", "committed", "merged", "blocked", "skipped", "done", "gate", "needs-split"] },
+          "sha": { "type": ["string", "null"], "description": "commit sha on the trail branch once committed" },
+          "fail_count": { "type": "integer" }
+        }
+      }
+    },
+    "trails": {
+      "type": "array",
+      "description": "dependency chains; one worktree + one implementer + one review per trail",
+      "items": {
+        "type": "object",
+        "required": ["id", "tickets", "deps", "status", "complexity"],
+        "properties": {
+          "id": { "type": "string", "description": "t1, t2, ..." },
+          "tickets": { "type": "array", "items": { "type": "string" }, "description": "ticket keys in execution order (max 4)" },
+          "deps": { "type": "array", "items": { "type": "string" }, "description": "trail ids that must be merged before this trail starts" },
+          "complexity": { "enum": ["XS", "S", "M"], "description": "max over the trail's tickets" },
+          "status": { "enum": ["pending", "building", "reviewing", "merging", "merged", "blocked"] },
+          "worktree": { "type": ["string", "null"] },
+          "branch": { "type": ["string", "null"], "description": "feat/<story>/<trail-id>" },
+          "agent": { "type": ["string", "null"], "description": "minion | implementer" },
+          "model": { "type": ["string", "null"], "description": "haiku | sonnet | opus (opus only on second attempt of an M trail)" },
+          "agent_id": { "type": ["string", "null"], "description": "subagent id for SendMessage follow-ups" },
+          "attempts": { "type": "integer" },
+          "review": { "type": ["string", "null"], "description": "ship | fix-then-ship | needs-rework" },
+          "reason": { "type": ["string", "null"], "description": "why blocked" }
+        }
+      }
+    }
+  }
+}

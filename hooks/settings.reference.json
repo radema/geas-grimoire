@@ -1,0 +1,255 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "ask": [
+      "Bash(git push:*)",
+      "mcp__claude_ai_Atlassian__createJiraIssue"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "skillOverrides": {
+    "speckit-cleanup": "off",
+    "grill-me": "off",
+    "grill-with-docs": "off",
+    "setup-matt-pocock-skills": "off"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|agent_needs_input",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TMUX_PANE\" ] && printf '\\a' > \"$(tmux display -p -t \"$TMUX_PANE\" '#{pane_tty}')\" || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/require_teammate_report.sh",
+            "timeout": 10,
+            "statusMessage": "Checking teammate sent report..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$HOME/.claude/.memory-triage-last\"; if [ ! -f \"$f\" ] || [ -n \"$(find \"$f\" -mtime +30 -print 2>/dev/null)\" ]; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Memory triage is due (last run more than 30 days ago, or never). Suggest running /memory-triage to the user; see the memory-triage skill.\"}}'; fi",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/root/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/guard_branch_ownership.sh",
+            "if": "Bash(git *)",
+            "timeout": 10,
+            "statusMessage": "Checking branch ownership..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/guard_push.sh",
+            "if": "Bash(git *)",
+            "timeout": 10,
+            "statusMessage": "Checking push target..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/guard_push.sh",
+            "if": "Bash(databricks *)",
+            "timeout": 10,
+            "statusMessage": "Checking bundle target..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/precommit_gate.sh",
+            "if": "Bash(git commit *)",
+            "timeout": 15,
+            "statusMessage": "Running pre-commit on staged files..."
+          },
+          {
+            "type": "command",
+            "command": "bash /root/geas-grimoire/skills/productivity/design/scripts/deny_bash_in_design.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/handoff/scripts/handoff.sh hook",
+            "timeout": 10,
+            "statusMessage": "Scanning handoff for credentials..."
+          },
+          {
+            "type": "command",
+            "command": "bash /root/geas-grimoire/skills/productivity/design/scripts/deny_edits_in_design.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/require_dispatch_cap.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/cap_nested_dispatch.sh",
+            "timeout": 10,
+            "statusMessage": "Checking leaf-agent sub-delegation..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/ticket_loop_cap.sh",
+            "timeout": 10,
+            "statusMessage": "Checking ticket-loop cap..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/ruff_check.sh",
+            "timeout": 30,
+            "statusMessage": "Linting with ruff..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /root/geas-grimoire/skills/productivity/design/scripts/design_prompt.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/verify_gate.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": false,
+    "commit-commands@claude-plugins-official": false,
+    "codex@openai-codex": true,
+    "code-review@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": false,
+    "impeccable@impeccable": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      },
+      "autoUpdate": true
+    }
+  },
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5": {
+      "effortLevel": "low"
+    },
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "low"
+    }
+  },
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "teammateMode": "auto",
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: private (<your-org>/<trusted-repo>, confirmed via gh)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured",
+      "**Default / protected branches**: default branch unknown (origin/HEAD unset); no protected branches listed (rulesets not queryable here — absence not confirmed)",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo (<your-org>/<trusted-repo>) and its origin remote only (no additional orgs configured)",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar; repo has .gitignore patterns suggesting local secrets: .env, secrets*, *.token — keep these out of commits/pushes",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited)",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development",
+      "**Trusted repo**: /root/<trusted-repo> (origin: github.com/<your-org>/<trusted-repo>, private)",
+      "**Org-specific CLIs**: None configured"
+    ]
+  }
+}

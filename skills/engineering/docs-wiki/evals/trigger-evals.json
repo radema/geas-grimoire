@@ -1,0 +1,26 @@
+{
+  "skill_name": "docs-wiki",
+  "note": "Triggering eval set for description optimization. Run with skill-creator's scripts/run_loop.py (uses `claude -p`, this session's login — no separate API key, but consumes subscription usage).",
+  "evals": [
+    { "query": "our new backend eng starts monday and has no idea how this monorepo is laid out — generate docs explaining what each part does and how they connect", "should_trigger": true },
+    { "query": "the apps/api folder is a mess of modules with zero READMEs, write documentation for all of them", "should_trigger": true },
+    { "query": "I merged a big refactor last week and the docs are now stale, bring them back in sync with the code", "should_trigger": true },
+    { "query": "produce onboarding documentation for the whole platform so a new hire can navigate it — overviews per area plus how the parts connect", "should_trigger": true },
+    { "query": "document the routine dev workflows — how to add an entity, run tests, do a migration — as guides linked from an overview", "should_trigger": true },
+    { "query": "document the geo module — just that folder for now", "should_trigger": true },
+    { "query": "I inherited this codebase, there's no documentation anywhere, make it understandable", "should_trigger": true },
+    { "query": "we want onboarding docs with links between concepts, like an internal wiki, for the whole platform", "should_trigger": true },
+    { "query": "refresh the docs/wiki pages — I renamed a bunch of files and moved the cache service", "should_trigger": true },
+    { "query": "generate hierarchical docs, a README per folder rolled up to the top", "should_trigger": true },
+    { "query": "write a docstring for this function", "should_trigger": false },
+    { "query": "add a comment explaining this regex", "should_trigger": false },
+    { "query": "review my PR for bugs", "should_trigger": false },
+    { "query": "update the CHANGELOG with the latest release notes", "should_trigger": false },
+    { "query": "generate the API reference from our OpenAPI spec", "should_trigger": false },
+    { "query": "fix the broken links in our top-level README", "should_trigger": false },
+    { "query": "explain to me how the authentication flow works", "should_trigger": false },
+    { "query": "set up a Docusaurus site for our docs", "should_trigger": false },
+    { "query": "write a blog post about our architecture", "should_trigger": false },
+    { "query": "translate the README to Spanish", "should_trigger": false }
+  ]
+}

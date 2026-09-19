@@ -1,0 +1,84 @@
+# Frozen evalset for self-harness project-scope validation (Path A).
+# Copy to manifest.yml and fill with your own cases. Keep 5-10 cases.
+# Each case is replayed in an isolated worktree/sandbox under each candidate harness,
+# `repeats` times, then scored by its `verifier`. See ../references/validation.md.
+#
+# Two case modes — prefer self-contained for portability:
+#
+#   self-contained : the case ships a starter dir under fixtures/<id>/ holding the
+#                    frozen oracle test + any starter code. Copied into the sandbox;
+#                    not tied to any real repo. Portable, no git pinning.
+#   pinned-repo    : the task runs against a real repo at a frozen commit. Needs
+#                    work_commit (task start) AND oracle_from (child commit the
+#                    verifier test is checked out from). Use only when the task is
+#                    genuinely repo-specific.
+#
+# THE ORACLE MUST BE INDEPENDENT OF THE AGENT. The agent implements/fixes code; it
+# must never write or edit the test that grades it, or the gate is circular. List the
+# oracle (and anything else off-limits) under `protect:` — the validation harness
+# reverts those paths to their frozen state before running the verifier.
+#
+# `discriminates` records whether the oracle FAILS before the task is done and PASSES
+# after. Only `yes` cases prove a feature was built; confirm it (run the verifier on
+# the untouched fixture — it should fail) before trusting a case.
+#   yes             : oracle fails at start, passes after correct work. The good kind.
+#   confirm         : plausible but unverified — check before relying on it.
+#   regression-only : oracle already passes at start; only catches the edit breaking
+#                     something. Weak signal; keep deliberately or drop.
+
+# Verifier invocation for self-contained python fixtures: `uv run --no-project --with pytest pytest`.
+# --with pytest uses uv's ephemeral cached tool env (no .venv created anywhere); --no-project isolates
+# it from any surrounding pyproject (so it won't pick up a repo's Spark conftest, which blocks local
+# pytest). Keep fixture tests stdlib-only so they need nothing beyond pytest.
+
+repeats: 3              # M: runs per case, to average out stochasticity
+
+cases:
+  # --- self-contained: implement from a spec, graded by a bundled test ---
+  - id: implement-from-spec
+    mode: self-contained
+    fixture: fixtures/parse_duration       # holds test_parse_duration.py (oracle) + empty solution.py
+    prompt: >
+      Implement parse_duration(s) in solution.py per its docstring: turn strings like
+      "1h30m", "45s", "2h" into a total number of seconds. Do not edit the tests.
+    verifier: uv run --no-project --with pytest pytest test_parse_duration.py -q
+    pass_when: exit_zero
+    protect: [test_parse_duration.py]
+    discriminates: yes                     # oracle fails until solution.py is implemented
+
+  # --- self-contained: fix a bug, graded by an existing failing test ---
+  - id: fix-failing-test
+    mode: self-contained
+    fixture: fixtures/off_by_one           # ships buggy summing.py + failing test_summing.py
+    prompt: >
+      The test in this directory fails. Find and fix the bug in the source so it
+      passes. Change only the source; do not modify the test.
+    verifier: uv run --no-project --with pytest pytest -q
+    pass_when: exit_zero
+    protect: [test_*.py]
+    discriminates: yes
+
+  # --- self-contained: a BEHAVIOR case — tests a harness rule, not just an output ---
+  # Verifier is a check script, not a unit test: confirm the change was surgical.
+  - id: surgical-change-only
+    mode: self-contained
+    fixture: fixtures/surgical             # ships module.py, module.orig.py, check_diff.sh
+    prompt: >
+      In module.py, change the default timeout from 30 to 60. Touch nothing else.
+    verifier: bash check_diff.sh           # exits 0 only if exactly the intended line changed
+    pass_when: exit_zero
+    protect: [check_diff.sh, module.orig.py]
+    discriminates: yes                     # passes only if the harness keeps edits surgical
+
+  # --- pinned-repo variant (template; fill only if a case must use a real repo) ---
+  # - id: <repo-specific-case>
+  #   mode: pinned-repo
+  #   repo: /path/to/repo
+  #   work_commit: <parent SHA — task start state>
+  #   oracle_from: <child SHA — verifier test checked out from here>
+  #   prompt: >
+  #     <the task>
+  #   verifier: uv run pytest <path>::<test> -q
+  #   pass_when: exit_zero
+  #   protect: [<path to oracle test>]
+  #   discriminates: confirm

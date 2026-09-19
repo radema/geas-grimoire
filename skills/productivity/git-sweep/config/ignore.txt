@@ -1,0 +1,11 @@
+# Branches and worktrees git-sweep must never propose deleting.
+#
+# One rule per line: <repo>:<glob>
+#   <repo>  repo directory basename, or * for every repo
+#   <glob>  fnmatch pattern, tested against a branch name and a worktree path
+# Lines starting with # and blank lines are ignored.
+#
+# scripts/apply_ignore.py also reads
+# ~/.claude/skills/morning-brief/config/ignore.txt, so a ref already
+# silenced in the daily brief is silenced here too. Put a rule here only when
+# it should apply to sweeps but not to the brief.

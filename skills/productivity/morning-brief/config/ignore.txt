@@ -1,0 +1,14 @@
+# Branches and worktrees the morning brief must never mention.
+#
+# One rule per line: <repo>:<glob>
+#   <repo>  repo directory basename, or * for every watched repo
+#   <glob>  fnmatch pattern against a branch name or a worktree path
+# Lines starting with # and blank lines are ignored.
+#
+# Rules here are applied in lib/bundle.py, before signals.py and
+# render_context.py see the data, so an ignored ref produces no unpushed
+# count, no stale-ref proposal, and no brief bullet.
+#
+# Examples -- placeholders, replace them with your own:
+#   example-repo:feat/deprecated-experiment
+#   *:wip/*

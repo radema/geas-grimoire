@@ -22,7 +22,8 @@ if [ "$OFF" = "1" ]; then
   MAP=$(bash "$DIR/design_flag.sh" path "$CWD" 2>/dev/null)
   bash "$DIR/design_flag.sh" off "$CWD" >/dev/null 2>&1
   if [ -n "$MAP" ]; then
-    jq -cn --arg ctx "Design mode OFF. Decision map: $MAP. Hand off to implementation now." \
+    MAPDIR=$(dirname "$MAP")
+    jq -cn --arg ctx "Design mode OFF. Decision map: $MAP. Offer the user: Plan (from the locked map, inline or $MAPDIR/plan.md) or Build (enforcement off). If the session was long, also propose a handoff doc." \
       '{hookSpecificOutput:{hookEventName:"UserPromptSubmit",additionalContext:$ctx}}'
   fi
   exit 0

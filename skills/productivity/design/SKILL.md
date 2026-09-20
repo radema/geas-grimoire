@@ -21,8 +21,15 @@ stops it.
 
 **Step 1 -- pick the map path.**
 
-- If the repo uses `.specify/specs/`, use `.specify/specs/<topic-slug>/design.md`.
-- Otherwise `<repo-root>/docs/design/<topic-slug>.md`.
+Run the search script: `bash <skill-dir>/scripts/design_map_home.sh <repo>`. It
+prints the decision-map home (an existing `.design/`, `.<harness>/design/` or
+`docs/design/` that already holds maps) or, if none exists, the suggested
+default `<repo-root>/.design/` with exit 1. The map is
+`<home>/<topic-slug>.md`.
+
+- On exit 0, use the printed home without asking.
+- On exit 1, batch into your first question round a single confirmation of the
+  default path, custom answer allowed.
 
 Create it if missing, with these sections:
 
@@ -57,8 +64,8 @@ working directory covers this; you don't need to pass a session id -- see
 - Batch clarifying questions into **one** `AskUserQuestion` call (up to 4
   questions), and always let a custom answer through.
 - After each answer set, append the ruling(s) to the map's Decisions section
-  with a date. Write nothing else outside the map (`docs/` and `.specify/`
-  paths are also allowed by the hook, for supporting notes).
+  with a date. Write nothing else outside the map; supporting notes are only
+  allowed in the map's own directory.
 - End every round with: "continue, or BUILD?"
 
 ## Exit
@@ -67,8 +74,19 @@ working directory covers this; you don't need to pass a session id -- see
 this automatically and confirms it). At that point:
 
 1. Summarize the map's Decisions and Build handoff sections.
-2. Propose a next step -- `ticket-loop` or an `implementer` dispatch, or ask
-   the user which. Do not start implementing inline unless asked directly.
+2. Offer two options and let the user pick:
+   - **Plan** -- write a plan from the locked map, inline in the reply or as
+     `<map-dir>/plan.md`.
+   - **Build** -- start implementing (enforcement is off). Dispatch per the
+     repo's own conventions if any exist, otherwise inline.
+   If the design session was long, also propose a handoff document (via the
+   `handoff` skill when this harness has one) for whichever option they choose.
+3. Do not start implementing inline unless the user picks Build and asks
+   directly.
+
+The skill is self-consistent: only the map and `design_map_home.sh` are
+required for it to work. Other skills (`handoff`, ticket planners, dispatch or
+implementer agents) are optional conveniences, never dependencies.
 
 ## Notes
 

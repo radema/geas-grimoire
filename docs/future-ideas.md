@@ -30,3 +30,28 @@ directories under `~/.claude/skills/` — go stale silently. Nothing tracks the 
   `to-spec` with "spec" renamed to "PRD". Upstream `to-spec` now says "(you may know this document
   as a PRD)" itself, so the fork no longer earned its keep and was dropped (`e32cf3e`). A stale
   fork of an upstream skill is the same drift problem seen from the other side.
+
+## Design skill & morning-brief (2026-09-20)
+
+Three open directions for `design`, one for `morning-brief`. Each is logged as a GitHub issue on
+`radema/geas-grimoire` (label `future-ideas`).
+
+- **design-D1 — Mode transitions design → plan → build.** Resolved 2026-09-20 (issue #14): the exit
+  from `BUILD` now offers Plan (inline or `<map-dir>/plan.md`) or Build, with a handoff doc proposed
+  for long sessions — prose handoff, no parallel plan flag (the harness plan modes already cover
+  that). Map discovery moved to `scripts/design_map_home.sh` (default `.design/`), dropping the
+  `.specify/specs/` special-case.
+  → issue [#14](https://github.com/radema/geas-grimoire/issues/14).
+- **design-D2 — Port the three enforcement hooks to an opencode plugin.** `deny_edits_in_design`,
+  `deny_bash_in_design` and `design_prompt` are Claude Code hooks wired via `~/.claude/settings.json`
+  and never run in opencode — there design mode is prose-only. 1:1 map to `tool.execute.before`,
+  `chat.params` and `chat.message` plugin hooks. Also fixes the stale `/root/geas-grimoire/...`
+  install paths in `SKILL.md`/`README.md`.
+  → issue [#15](https://github.com/radema/geas-grimoire/issues/15).
+- **design-D3 — Duplicate as an installable plugin for another host (the "pi"-plugin).** Open
+  question, deliberately: which platform, and whether it is a separate session/repository.
+  → issue [#16](https://github.com/radema/geas-grimoire/issues/16).
+- **morning-brief-MB1 — Mode selector + interactive HTML artifact.** Choose at runtime between
+  `html` (fill a local template, updated day-over-day, user-interactive) and `local` (markdown
+  file / inline chat, as today). Design this first using the design skill itself.
+  → issue [#17](https://github.com/radema/geas-grimoire/issues/17).

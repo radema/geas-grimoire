@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!--
+  morning-brief living artifact — fillable template (design map D6–D8).
+  Path: skills/productivity/morning-brief/reference/brief.html
+
+  HOW THE AGENT FILLS THIS (read this before writing the day's file):
+
+  1. Read yesterday's brief.html if present. Extract the JSON from
+     <script type="application/json" id="brief-state"> and keep its "items"
+     map as the carry-over state: id -> {s, note}. If the user exported a
+     browser state file (brief-YYYY-MM-DD.state.json), read that instead —
+     it is more current than the file's embedded state.
+  2. Compose today's content per reference/format.md exactly as you would the
+     markdown brief: same group order, same prose rules, same emoji markers,
+     same caps. Write the formatted HTML into the sections below, replacing
+     the worked-example content.
+  3. Mark every actionable item (✅ TODAY, 🧵 IN PROGRESS, 👤 WAITING ON YOU)
+     with class="actionable" and a data-key. data-key must be a stable,
+     handle-derived slug (e.g. data-key="report-year-ceiling") — the SAME
+     key for the same underlying work across days, so carry-over matches it.
+     An item that is the same work as another (TODAY item 2 = WAITING
+     "Alex's two PRs") reuses ONE key; the flags stay in sync.
+  4. Update the JSON state block: keep carried items, drop keys whose work is
+     gone, default new items to {"s":"todo"}, set "date" to today, and keep
+     "dayNote" as carried. Then write the whole file.
+  5. Do NOT leave the worked-example content or its seed demo state in the
+     committed reference/brief.html — the committed version is the empty
+     template. This file ships with the example so a bare file:// open shows
+     a working, interactive brief for validation.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morning Brief</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --fg: #c9d1d9; --dim: #8b949e; --muted: #6e7681;
+    --green: #3fb950; --red: #f85149; --amber: #d29922;
+    --blue: #58a6ff; --purple: #bc8cff; --gray: #484f58;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 80px; background: var(--bg); color: var(--fg);
+    font: 13px/1.55 ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+  #header-line { font-weight: 700; color: #f0f6fc; }
+  #load-verdict { margin: 4px 0 18px; font-size: 12px; }
+  .chip { display: inline-block; padding: 0 6px; border: 1px solid var(--border); border-radius: 3px; }
+  .chip.open   { color: var(--green); border-color: var(--green); }
+  .chip.normal { color: var(--amber); border-color: var(--amber); }
+  .chip.heavy  { color: var(--red);    border-color: var(--red); }
+
+  section { margin: 0 0 22px; }
+  .sec-title { color: #f0f6fc; font-weight: 700; margin: 0 0 6px; font-size: 13px; }
+  .sec-sub  { color: var(--dim); margin: 0 0 6px; }
+  p { margin: 0 0 6px; }
+  p.opening { color: var(--dim); }
+  .bullet { margin: 0 0 4px; position: relative; padding-left: 26px; }
+  .st-dropped .itemtext { text-decoration: line-through; color: var(--muted); }
+
+  /* status dot (click-to-cycle) */
+  .status {
+    position: absolute; left: 0; top: 2px; width: 14px; height: 14px;
+    border: 1px solid var(--border); border-radius: 50%; cursor: pointer;
+    background: var(--bg); flex: none;
+  }
+  .status:hover { border-color: var(--fg); }
+  .st-todo    .status { background: var(--panel); border-color: var(--gray); }
+  .st-started .status { background: var(--blue);  border-color: var(--blue); }
+  .st-done    .status { background: var(--green); border-color: var(--green); }
+  .st-blocked .status { background: var(--red);   border-color: var(--red); }
+  .st-dropped .status { background: var(--gray);  border-color: var(--gray); }
+
+  .note-btn {
+    cursor: pointer; color: var(--muted); background: none; border: none;
+    padding: 0 2px; font-size: 12px; font-family: inherit;
+  }
+  .note-btn:hover { color: var(--fg); }
+  .note-box { display: none; }
+  .note-box.open { display: block; margin: 4px 0 8px 26px; }
+  .note-box textarea {
+    width: 100%; min-height: 44px; resize: vertical; padding: 6px 8px;
+    background: var(--panel); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 4px; font: inherit;
+  }
+  .note-box textarea:focus { outline: 1px solid var(--blue); }
+
+  /* TODAY items */
+  ol.today { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: today; }
+  ol.today li { counter-increment: today; margin: 0 0 6px; position: relative; padding-left: 26px; }
+  ol.today li::before {
+    content: counter(today) "."; position: absolute; left: 26px; top: -1px;
+    color: var(--muted); font-weight: 700;
+  }
+  .tag { color: var(--dim); }
+  code {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 3px;
+    padding: 0 3px; font-size: 12px; color: var(--fg);
+  }
+
+  h3.dayhead { margin: 34px 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #day-notes { width: 100%; min-height: 110px; resize: vertical; }
+  .buttons { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+  button.act {
+    background: var(--panel); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 5px 10px; cursor: pointer; font: inherit; font-size: 12px;
+  }
+  button.act:hover { border-color: var(--fg); }
+  #updated { color: var(--muted); font-size: 11px; margin-left: auto; }
+  footer#brief-footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--border); color: var(--dim); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Morning Brief</h1>
+  <div class="meta" id="date-display"></div>
+
+  <!-- ══ SECTION: HEADER + LOAD VERDICT ══ -->
+  <div id="header-line">**Monday 7 September** — first brief since Friday 4th. Four of your PRs landed in <code>data-platform</code> over the gap; one of Friday's three commitments is done.</div>
+  <div id="load-verdict">Load: <span class="chip normal" id="load-chip">NORMAL</span></div>
+
+  <!-- ══ SECTION: ▶ START HERE ══ -->
+  <section id="sec-start">
+    <div class="sec-title" data-marker="▶">▶ START HERE</div>
+  </section>
+
+  <!-- ══ SECTION: 🔁 SINCE LAST BRIEF ══ -->
+  <section id="sec-since">
+    <div class="sec-title" data-marker="🔁">🔁 SINCE LAST BRIEF (Fri 4 Sep)</div>
+  </section>
+
+  <!-- ══ SECTION: 🧵 IN PROGRESS ══ -->
+  <section id="sec-threads">
+    <div class="sec-title" data-marker="🧵">🧵 IN PROGRESS · 5 more threads</div>
+    <p class="opening">Two dangling with uncommitted work behind them, one waiting on you.</p>
+  </section>
+
+  <!-- ══ SECTION: 👤 WAITING ON YOU ══ -->
+  <section id="sec-waiting">
+    <div class="sec-title" data-marker="👤">👤 WAITING ON YOU</div>
+    <p class="opening">Alex Rivera is the only person blocked on you.</p>
+  </section>
+
+  <!-- ══ SECTION: 🎫 JIRA ══ -->
+  <section id="sec-jira">
+    <div class="sec-title" data-marker="🎫">🎫 JIRA · 50 open — 10 yours, 15 with colleagues, 25 unowned (13 old backlog)</div>
+  </section>
+
+  <!-- ══ SECTION: 📦 REPOS ══ -->
+  <section id="sec-repos">
+    <div class="sec-title" data-marker="📦">📦 REPOS</div>
+  </section>
+
+  <!-- ══ SECTION: 🧹 CLEANUP ══ -->
+  <section id="sec-cleanup">
+    <div class="sec-title" data-marker="🧹">🧹 CLEANUP</div>
+  </section>
+
+  <!-- ══ SECTION: ✅ TODAY ══ -->
+  <section id="sec-today">
+    <div class="sec-title" data-marker="✅">✅ TODAY</div>
+  </section>
+
+  <footer id="brief-footer">Jira, GitHub, git, handoffs, stale refs reached. Calendar/mail not covered — check those yourself.</footer>
+
+  <!-- ══ DAY NOTES ══ -->
+  <h3 class="dayhead">Day notes</h3>
+  <textarea id="day-notes" placeholder="Open thoughts, decisions, links worth keeping..."></textarea>
+  <div class="buttons">
+    <button class="act" id="btn-export">Export state</button>
+    <button class="act" id="btn-reset">Reset flags for today</button>
+    <span id="updated"></span>
+  </div>
+</main>
+
+<!--
+  ══ STATE BLOCK (canonical day-to-day state, D4) ══
+  The agent reads this JSON when it writes tomorrow's file and carries the
+  "items" map across. Keys must match data-key attributes in the markup above.
+  Status values: todo | started | done | blocked | dropped.
+-->
+<script type="application/json" id="brief-state">
+{
+  "date": "2026-09-20",
+  "items": {
+    "abc-101-refresh-map":  { "s": "started", "note": "G1 + README row written, commit still pending" },
+    "alex-two-prs":         { "s": "todo",     "note": "" },
+    "overdue-quartet":      { "s": "todo",     "note": "" },
+    "report-year-ceiling":  { "s": "done",     "note": "Parked ABC-110 properly, feels done" },
+    "core-api-identical":   { "s": "todo",     "note": "" },
+    "staging-testing-skill":{ "s": "blocked",  "note": "Waiting on answer to §6.1" },
+    "baseline-plan":        { "s": "todo",     "note": "" }
+  },
+  "dayNote": "Rollout demo Thursday — verify ABC-102 status before tomorrow's brief."
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── state load, browser localStorage is a per-day mirror (graceful no-op) ──
+  var SDATE = "2026-09-20";
+  var LSKEY = "morning-brief." + SDATE;
+  var embedEl = document.getElementById("brief-state");
+  var state = null;
+  try { state = JSON.parse(embedEl.textContent); } catch (e) { state = { date: SDATE, items: {}, dayNote: "" }; }
+
+  var lsworks = true, cachedLS = null;
+  try {
+    cachedLS = localStorage.getItem(LSKEY);
+  } catch (e) { lsworks = false; }
+  if (lsworks && cachedLS) {
+    try { state = JSON.parse(cachedLS); } catch (e) { /* keep embedded */ }
+  }
+
+  var items = state.items || {};
+  var STATUSES = ["todo", "started", "done", "blocked", "dropped"];
+  var STATUS_TITLE = { todo: "todo", started: "started", done: "done", blocked: "blocked", dropped: "dropped" };
+
+  // ── save: mirror to localStorage + rewrite embedded JSON + stamp ──
+  function save() {
+    state.items = items;
+    state.date = SDATE;
+    var json = JSON.stringify(state, null, 2);
+    embedEl.textContent = json;
+    if (lsworks) {
+      try { localStorage.setItem(LSKEY, json); } catch (e) { lsworks = false; }
+    }
+    var el = document.getElementById("updated");
+    el.textContent = "saved " + new Date().toLocaleTimeString();
+  }
+
+  // ── wire the demo: render worked-example bullets into slots so a bare
+  //    file:// open shows a complete, interactive brief ──
+  function slot(id, html) { document.getElementById(id).innerHTML += html; }
+
+  slot("sec-start",
+    '<p class="bullet actionable" data-key="abc-101-refresh-map">' +
+      'you stopped Thursday with G1 and the README row written but not committed, on <code>data-platform</code> branch <code>docs/ABC-101-quarterly-refresh-map</code> (dirty 2d). First move: one <code>docs(research):</code> commit, then the branch is PR-ready. About 15 minutes.' +
+    '</p>');
+
+  slot("sec-since",
+    '<p class="bullet">Friday\'s commitments — confirm PR #1428 merged → done. Commit G1 on the ABC-101 branch → not done, branch still dirty. Review Alex\'s payments mappings #1423 → still open.</p>' +
+    '<p class="bullet">Landed — <code>data-platform</code>: 4 PRs into <code>dev</code>, all yours: report year ceiling (#1428), tax-code padding (#1421), export folder suffix (#1424), PR templates per base branch (#1419). Nothing elsewhere.</p>' +
+    '<p class="bullet">Threads moved — report year ceiling: its next step is done. The other five did not move.</p>');
+
+  slot("sec-threads",
+    '<p class="bullet actionable" data-key="report-year-ceiling">Dangling, 3d. PR #1428 is merged; the follow-up already exists as ABC-110, a staging integration test, unowned. <b>Next:</b> take ABC-110 or give it an owner.</p>' +
+    '<p class="bullet actionable" data-key="core-api-identical">Open loop, 4d. <b>Next:</b> it is waiting on your answer to question §6.1.</p>' +
+    '<p class="bullet actionable" data-key="staging-testing-skill">Open loop, 4d, from the ABC-206/ABC-207 promotion run. No next step recorded. ABC-206 Topic B gold is due Thu 11 Sep.</p>' +
+    '<p class="bullet actionable" data-key="baseline-plan">Dangling, 6d. <code>ml-pipelines</code> dirty 2d on <code>stage</code>. <b>Next:</b> commit the doc edits.</p>' +
+    '<p class="bullet">Parked: <b>V1.1 roadmap draft</b> — Cold, 33d.</p>');
+
+  slot("sec-waiting",
+    '<p class="bullet actionable" data-key="alex-two-prs"><code>data-platform</code> #1429 waste-data ingestion refactor, #1423 payments mappings for billing. #1423 was on Friday\'s list. ⚠️</p>');
+
+  slot("sec-jira",
+    '<p class="bullet"><b>ABC-102 blocked</b> — regional downscaling on the converged model vintage, gates the regional rollout. 7d untouched, due 28 Aug, overdue. ⚠️</p>' +
+    '<p class="bullet"><b>Four overdue of yours</b> — asset refactor (ABC-201, 119d), impact-model chores (ABC-202, 63d), report region-level NULLs (ABC-203, 46d), ops handbook (ABC-204, 33d).</p>' +
+    '<p class="bullet"><b>Five In corso quiet 5d</b> — Topic A gold (ABC-205) and Topic B gold (ABC-206), both due Thu 11 Sep; quarterly ingestion (PROJ-45), Report Research (PROJ-46), Report Sport (PROJ-47).</p>' +
+    '<p class="bullet"><b>Twelve unowned, filed this week</b> — nine are one cluster on the report year ceiling and coverage policy (ABC-301–ABC-309); ABC-101 is the START HERE branch; ABC-310/ABC-311 are a new project\'s set-up pair.</p>');
+
+  slot("sec-repos",
+    '<p class="bullet"><b>banner card</b> — <code>web-app</code> dirty on <code>fix/hide-banner-card</code>; no handoff or ticket covers it, last commit is a dependabot bump.</p>');
+
+  slot("sec-cleanup",
+    '<p class="bullet">6 merged branches (data-platform 4, ml-pipelines 1, core-mono 1), all <code>git branch -d</code> safe.</p>');
+
+  slot("sec-today",
+    '<ol class="today">' +
+      '<li class="actionable" data-key="abc-101-refresh-map">Commit G1 + README row on <code>docs/ABC-101-quarterly-refresh-map</code> and open the PR — do it. <span class="tag">quick (yours)</span></li>' +
+      '<li class="actionable" data-key="alex-two-prs">they are blocked; agent first pass, you merge — hand it over. <span class="tag">involved (→ <code>code-reviewer</code>)</span> ⚠️</li>' +
+      '<li class="actionable" data-key="overdue-quartet">ABC-201, ABC-202, ABC-203, ABC-204, overdue 33–119 days — park until Mon 14 Sep. <span class="tag">quick (yours)</span></li>' +
+    '</ol>');
+
+  // ── five-state click-to-cycle on actionable items ──
+  document.querySelectorAll(".actionable").forEach(function (node) {
+    var key = node.getAttribute("data-key");
+    var st = items[key] || { s: "todo", note: "" };
+    items[key] = st;
+    if (st.s === "dropped") node.classList.add("st-dropped");
+
+    var dot = document.createElement("span");
+    dot.className = "status st-" + (st.s || "todo");
+    dot.title = "status: " + (st.s || "todo");
+    node.prepend(dot);
+
+    node.classList.add("st-" + (st.s || "todo"));
+    dot.addEventListener("click", function () {
+      var i = STATUSES.indexOf((items[key].s || "todo"));
+      var next = STATUSES[(i + 1) % STATUSES.length];
+      items[key].s = next;
+      node.classList.remove("st-todo", "st-started", "st-done", "st-blocked", "st-dropped");
+      node.classList.add("st-" + next);
+      if (next === "dropped") node.classList.add("st-dropped");
+      else node.classList.remove("st-dropped");
+      dot.className = "status st-" + next;
+      dot.title = "status: " + STATUS_TITLE[next];
+      save();
+    });
+
+    // -- note toggle + field --
+    var nb = document.createElement("button");
+    nb.className = "note-btn";
+    nb.textContent = "\u270e";
+    nb.title = "note";
+    nb.setAttribute("aria-label", "note for this item");
+    node.appendChild(nb);
+
+    var box = document.createElement("div");
+    box.className = "note-box";
+    var ta = document.createElement("textarea");
+    ta.placeholder = "note for this item";
+    ta.value = st.note || "";
+    ta.addEventListener("input", function () { items[key].note = ta.value; save(); });
+    box.appendChild(ta);
+    node.appendChild(box);
+    nb.addEventListener("click", function () { box.classList.toggle("open"); });
+  });
+
+  // ── day notes pad ──
+  var dayNotes = document.getElementById("day-notes");
+  dayNotes.value = state.dayNote || "";
+  dayNotes.addEventListener("input", function () { state.dayNote = dayNotes.value; save(); });
+
+  // ── export browser state to a file the agent can read tomorrow (D4 bridge) ──
+  document.getElementById("btn-export").addEventListener("click", function () {
+    var blob = new Blob([JSON.stringify({ date: SDATE, items: items, dayNote: dayNotes.value }, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "brief-" + SDATE + ".state.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 50);
+  });
+
+  // ── reset today's flags (keeps notes? no — clears both, honest reset) ──
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    if (!confirm("Reset all flag states for today? Notes are cleared too.")) return;
+    Object.keys(items).forEach(function (k) { items[k] = { s: "todo", note: "" }; });
+    dayNotes.value = "";
+    state.dayNote = "";
+    document.querySelectorAll(".actionable").forEach(function (node) {
+      var key = node.getAttribute("data-key");
+      node.classList.remove("st-todo", "st-started", "st-done", "st-blocked", "st-dropped", "st-dropped");
+      node.classList.add("st-todo");
+      var dot = node.querySelector(".status");
+      if (dot) { dot.className = "status st-todo"; dot.title = "status: todo"; }
+      var ta = node.querySelector(".note-box textarea");
+      if (ta) ta.value = "";
+    });
+    save();
+  });
+
+  document.getElementById("date-display").textContent = "state carried for " + SDATE;
+  save();
+})();
+</script>
+</body>
+</html>
